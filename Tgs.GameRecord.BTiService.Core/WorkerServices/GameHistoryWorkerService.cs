@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.GameInterface.BTiService.Client;
+using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.BTiService.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -42,7 +44,7 @@ internal class GameHistoryWorkerService : ICommandService<GameHistoryWorkerComma
 
             _logger.LogInformation("LogOn:{logOn} | Action:GameHistoryUnsettledAsync | Response:{response}",
                 DateTime.UtcNow.ToString("O"),
-                gameHistoryUnsettleds);
+                JsonSerializer.Serialize(gameHistoryUnsettleds));
 
             await _unsettledService
                 .ExecuteAsync(
@@ -69,10 +71,9 @@ internal class GameHistoryWorkerService : ICommandService<GameHistoryWorkerComma
                         cancellationToken: cancellationToken)
                     .ToArrayAsync(cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
-
             _logger.LogInformation("LogOn:{logOn} | Action:GameHistorySettledAsync | Response:{response}",
                 DateTime.UtcNow.ToString("O"),
-                gameHistorySettleds);
+                JsonSerializer.Serialize(gameHistorySettleds));
 
             await _settledService
                 .ExecuteAsync(
