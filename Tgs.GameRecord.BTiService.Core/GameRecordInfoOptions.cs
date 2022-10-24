@@ -7,8 +7,8 @@ public record GameRecordInfoOptions
     public double MaxIntervalMinute { get; set; } = 30d;
     public double MinIntervalMinute { get; set; } = 1d;
 
-    public double IntervalMinute { get; set; } = 30d;
-    public double LockMinute { get; set; } = 28.5d;
+    public double IntervalMinute { get; set; } = 5d;
+    public double LockMinute { get; set; } = 4d;
 
     public string MongoDefine { get; set; } = default!;
 

@@ -75,6 +75,7 @@ builder.Services.AddGameRecordCore(
     });
 
 var gameRecordInfo = builder.Configuration.GetSection("GameRecordInfo").Get<GameRecordInfoOptions>();
+var natsSetting = builder.Configuration.GetSection("NatsSetting").Get<NatsSettingOptions>();
 
 builder.Services
     .AddMessageQueue()
@@ -97,7 +98,7 @@ builder.Services
              var configuration = sp.GetRequiredService<IConfiguration>();
              options.Url = configuration.GetConnectionString("Nats");
          })
-         .AddProcessor<ManualMessageHandler>("gp.gamerecord.manual.sbotf", "gp.gamerecord.manual");
+         .AddProcessor<ManualMessageHandler>(natsSetting.Subject, natsSetting.Queue);
      })
      .ClearAllExchanges()
      .AddMongoGlobPatternExchange(gameRecordInfo.MongoGlobPattern, gameRecordInfo.MongoDefine, gameRecordInfo.MongoGlobPattern);

@@ -16,6 +16,10 @@ data:
         "MongoGlobPattern": "tgs.gp.gamerecord.database.round.bti",
         "GameExternalId": "sports_book"
       },
+      "NatsSetting": {
+        "Group": "gp.gamerecord.schedule",
+        "Subject": "gp.gamerecord.schedule.bti"
+      },
       "GameRecord": {
          "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver/",
          "GameInterfaceBaseUrl": "http://game-gameinterface-bti-service:9090/"
