@@ -21,23 +21,25 @@ public class BTiController : ControllerBase
     ///     Post
     ///
     ///         {
-    ///             "apiUrl": "https://ex-api-demo-yy.568win.com",
-    ///             "companyKey": "49ED28A987624CA0A3F834C3B8A69AAB",
-    ///             "agent": "STAG_GPI_CNY",
-    ///             "startTime": "2022-09-22T17:00:00+08:00",
-    ///             "endTime": "2022-09-22T17:30:00+08:00"
+    ///             "tokenApiUrl": "https://asia-east2-bq-data-api.cloudfunctions.net/",
+    ///             "openBetsApiUrl": "https://get-open-bets-d5nlg5buca-de.a.run.app/",
+    ///             "historyBetsPagingApiUrl": "https://get-history-bets-paging-d5nlg5buca-de.a.run.app/",
+    ///             "agentUserName": "PegaGaming_GPIRMB",
+    ///             "agentPassword": "IM60Ho7Y4B9C",
+    ///             "startTime": "2022-10-24T00:00:00+08:00",
+    ///             "endTime": "2022-10-25T00:00:00+08:00
     ///         }
     /// </remarks>
     [HttpPost]
     public ValueTask GameHistoryBySportsBookAsync(
-        [FromServices] ICommandService<GameHistoryWorkerCommand> service,
-        GameRecordQueryViewModel model)
-        => service.ExecuteAsync(new GameHistoryWorkerCommand(
-            TokenApiUrl: model.TokenApiUrl,
-            OpenBetsApiUrl: model.OpenBetsApiUrl,
-            HistoryBetsPagingApiUrl: model.HistoryBetsPagingApiUrl,
-            AgentUserName: model.AgentUserName,
-            AgentPassword: model.AgentPassword,
-            StartTime: model.StartTime,
-            EndTime: model.EndTime));
+            [FromServices] ICommandService<GameHistoryWorkerCommand> service,
+            GameRecordQueryViewModel model)
+            => service.ExecuteAsync(new GameHistoryWorkerCommand(
+                TokenApiUrl: model.TokenApiUrl,
+                OpenBetsApiUrl: model.OpenBetsApiUrl,
+                HistoryBetsPagingApiUrl: model.HistoryBetsPagingApiUrl,
+                AgentUserName: model.AgentUserName,
+                AgentPassword: model.AgentPassword,
+                StartTime: model.StartTime,
+                EndTime: model.EndTime));
 }

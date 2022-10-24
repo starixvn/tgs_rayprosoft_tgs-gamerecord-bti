@@ -36,8 +36,8 @@ internal class GameHistoryWorkerService : ICommandService<GameHistoryWorkerComma
                         openBetsApiUrl: command.OpenBetsApiUrl,
                         agentUserName: command.AgentUserName,
                         agentPassword: command.AgentPassword,
-                        startTime: command.StartTime,
-                        endTime: command.EndTime,
+                        startTime: command.StartTime.ToUniversalTime(),
+                        endTime: command.EndTime.ToUniversalTime(),
                         cancellationToken: cancellationToken)
                     .ToArrayAsync(cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
@@ -71,8 +71,8 @@ internal class GameHistoryWorkerService : ICommandService<GameHistoryWorkerComma
                             historyBetsPagingApiUrl: command.HistoryBetsPagingApiUrl,
                             agentUserName: command.AgentUserName,
                             agentPassword: command.AgentPassword,
-                            startTime: command.StartTime,
-                            endTime: command.EndTime,
+                            startTime: command.StartTime.ToUniversalTime(),
+                            endTime: command.EndTime.ToUniversalTime(),
                             page: page,
                             pageLimit: pageLimit,
                             cancellationToken: cancellationToken)
