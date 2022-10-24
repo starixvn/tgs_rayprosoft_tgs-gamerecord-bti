@@ -10,8 +10,8 @@ data:
         "GameProviderCode": "BTI",
         "MinIntervalMinute": 1,
         "MaxIntervalMinute": 30,
-        "IntervalMinute": 3,
-        "LockMinute": 2,
+        "IntervalMinute": 5,
+        "LockMinute": 4,
         "MongoDefine":  "gp.gamerecord.database.manual",
         "MongoGlobPattern": "tgs.gp.gamerecord.database.manual.bti",
         "GameExternalId": "sports_book"
