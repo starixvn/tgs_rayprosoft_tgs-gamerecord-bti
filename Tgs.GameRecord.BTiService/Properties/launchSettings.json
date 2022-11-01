@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Tgs.GameRecord.SBOService": {
+    "Tgs.GameRecord.BTiService": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

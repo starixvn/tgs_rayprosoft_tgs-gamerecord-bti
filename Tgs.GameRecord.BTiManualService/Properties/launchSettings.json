@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Tgs.GameRecord.SBOManualService": {
+    "Tgs.GameRecord.BTiManualService": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
