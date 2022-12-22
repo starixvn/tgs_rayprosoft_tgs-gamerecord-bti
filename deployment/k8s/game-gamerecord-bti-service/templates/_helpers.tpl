@@ -47,10 +47,10 @@ Selector labels
 */}}
 {{- define "game-gamerecord-bti-service.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "game-gamerecord-bti-service.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
 app: {{ include "game-gamerecord-bti-service.name" . }}
 tgs.kind: game
 tgs.game.kind: gamerecord
+tgs.gamerecord.kind: service
 tgs.gameprovider.kind: bti
 {{- end }}
 

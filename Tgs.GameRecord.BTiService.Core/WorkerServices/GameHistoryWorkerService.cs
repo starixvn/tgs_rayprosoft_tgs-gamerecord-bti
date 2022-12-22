@@ -1,7 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Tgs.GameInterface.BTiService.Client;
-using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.BTiService.Core.ApplicationServices;
 using Tgs.ServiceUtility;
 
@@ -11,8 +10,8 @@ internal class GameHistoryWorkerService : ICommandService<GameHistoryWorkerComma
 {
     private readonly IGameInterfaceBTiClient _client;
     private readonly ILogger<GameHistoryWorkerService> _logger;
-    private readonly ICommandService<GamePullRecordUnsettledCommand> _unsettledService;
     private readonly ICommandService<GamePullRecordSettledCommand> _settledService;
+    private readonly ICommandService<GamePullRecordUnsettledCommand> _unsettledService;
 
     public GameHistoryWorkerService(
         IGameInterfaceBTiClient client,

@@ -10,8 +10,8 @@ namespace Tgs.GameRecord.BTiService.Core.ApplicationServices;
 
 internal class GamePullRecordUnsettledCommandService : ICommandService<GamePullRecordUnsettledCommand>
 {
-    private readonly ILogger<GamePullRecordUnsettledCommandService> _logger;
     private readonly GameRecordInfoOptions _gameRecordInfo;
+    private readonly ILogger<GamePullRecordUnsettledCommandService> _logger;
     private readonly IMessageSender _messageSender;
     private readonly IUtensil _utensil;
 
