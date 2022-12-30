@@ -1,4 +1,4 @@
-apiVersion: v1
+﻿apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-{{ include "game-gamerecord-bti-manualservice.name" . }}
@@ -21,7 +21,7 @@ data:
         "Subject": "gp.gamerecord.manual.bti"
       },
       "GameRecord": {
-         "GameProvidersQueryServerBaseUrl": "http://game-gameprovider-queryserver/",
+         "GameCommandClientBaseUrl": "http://game-gamecommand/",
          "GameInterfaceBaseUrl": "http://game-gameinterface-bti-service:9090/"
       }
     }

@@ -1,17 +1,17 @@
 ﻿using Microsoft.Extensions.Options;
-using Tgs.GameProviders.QueryServer.Client;
-using Tgs.GameProviders.QueryServer.Models;
+using Tgs.GameCommand.Client;
+using Tgs.GameCommand.Common;
 
 namespace Tgs.GameRecord.BTiService.Core;
 
 internal class UtensilRepository : IUtensil
 {
-    private readonly IGameProvidersQueryServerClient _client;
+    private readonly IGameCommandClient _client;
     private readonly GameRecordInfoOptions _gameRecordInfo;
 
     public UtensilRepository(
          IOptions<GameRecordInfoOptions> options,
-        IGameProvidersQueryServerClient client)
+        IGameCommandClient client)
     {
         _gameRecordInfo = options.Value;
         _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -30,6 +30,6 @@ internal class UtensilRepository : IUtensil
     => await _client.GameProviderGetGameProviderIdAsync(_gameRecordInfo.GameProviderCode).ConfigureAwait(false)
         ?? throw new Exception($"The identifier for this game provider does not exist.({_gameRecordInfo.GameProviderCode})");
 
-    public ValueTask<PlayerModel?> GetPlayerAsync(string playerCode)
+    public ValueTask<PlayerInfo?> GetPlayerAsync(string playerCode)
         => _client.PlayerGetAsync(playerCode);
 }
