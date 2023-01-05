@@ -12,13 +12,7 @@ data:
         "MaxIntervalMinute": 30,
         "IntervalMinute": 15,
         "LockMinute": 14,
-        "MongoDefine":  "gp.gamerecord.database.manual",
-        "MongoGlobPattern": "tgs.gp.gamerecord.database.manual.bti",
         "GameExternalId": "sports_book"
-      },
-      "NatsSetting": {
-        "Queue": "gp.gamerecord.manual",
-        "Subject": "gp.gamerecord.manual.bti"
       },
       "GameRecord": {
          "GameCommandClientBaseUrl": "http://game-gamecommand/",

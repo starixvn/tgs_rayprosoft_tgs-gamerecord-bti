@@ -12,13 +12,7 @@ data:
         "MaxIntervalMinute": 30,
         "IntervalMinute": 15,
         "LockMinute": 14,
-        "MongoDefine": "gp.gamerecord.database",
-        "MongoGlobPattern": "tgs.gp.gamerecord.database.round.bti",
         "GameExternalId": "sports_book"
-      },
-      "NatsSetting": {
-        "Group": "gp.gamerecord.schedule",
-        "Subject": "gp.gamerecord.schedule.bti"
       },
       "GameRecord": {
          "GameCommandClientBaseUrl": "http://game-gamecommand/",
