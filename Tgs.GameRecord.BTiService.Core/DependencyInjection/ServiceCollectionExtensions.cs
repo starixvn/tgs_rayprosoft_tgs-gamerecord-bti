@@ -11,23 +11,26 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         Action<RedisOptions, IServiceProvider> redisDBconfigure,
         Action<GameRecordInfoOptions, IServiceProvider> gameRecordInfoOptions,
+        Action<MongoSettingOptions, IServiceProvider> mongoSettingOptions,
         Action<GameInterfaceBTiClientOptions, IServiceProvider> gameInterfaceBTiClientOptions,
         Action<GameCommandClientOptions, IServiceProvider> gameCommandClientOptions)
         => services
             .AddOptions<RedisOptions>()
             .Configure(redisDBconfigure)
             .Services
-            .AddMemoryCache()
-            .AddSingleton<RedisConnectionManager>()
             .AddOptions<GameRecordInfoOptions>()
             .Configure(gameRecordInfoOptions)
+            .Services
+            .AddOptions<MongoSettingOptions>()
+            .Configure(mongoSettingOptions)
             .Services
             .RegisterAllServiceUtilityTypes(
                 Assembly.GetExecutingAssembly(),
                 ServiceLifetime.Transient)
+            .AddMemoryCache()
+            .AddSingleton<RedisConnectionManager>()
             .AddGameInterfaceBTiServiceClient(gameInterfaceBTiClientOptions)
             .AddGameCommandClient(gameCommandClientOptions)
             .AddTransient<IScheduleDispatch>(sp => ActivatorUtilities.CreateInstance<ScheduleDispatch>(sp, sp.GetRequiredService<RedisConnectionManager>().Database))
-            .AddTransient<IUtensil, UtensilRepository>()
-            .Decorate<IUtensil>((innerRepository, sp) => ActivatorUtilities.CreateInstance<UtensilMemoryCacheRepository>(sp, innerRepository, TimeSpan.FromHours(1)));
+            .AddTransient<IUtensil>(sp => ActivatorUtilities.CreateInstance<UtensilRepository>(sp, TimeSpan.FromHours(1)));
 }
