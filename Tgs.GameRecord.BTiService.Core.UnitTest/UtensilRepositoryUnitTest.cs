@@ -15,11 +15,11 @@ public class UtensilRepositoryUnitTest
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            MinIntervalMinute = 5,
-            MaxIntervalMinute = 30,
-            IntervalMinute = 15,
-            LockMinute = 14,
-            GameExternalId = "sports_book"
+            GameExternalId = "sports_book",
+            IntervalMinutes = 5,
+            IntervalMinutesMax = 30,
+            IntervalMinutesMinimum = 1,
+            LockMinute = 4
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -73,11 +73,11 @@ public class UtensilRepositoryUnitTest
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            MinIntervalMinute = 5,
-            MaxIntervalMinute = 30,
-            IntervalMinute = 15,
-            LockMinute = 14,
-            GameExternalId = "sports_book"
+            GameExternalId = "sports_book",
+            IntervalMinutes = 5,
+            IntervalMinutesMax = 30,
+            IntervalMinutesMinimum = 1,
+            LockMinute = 4
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -130,11 +130,11 @@ public class UtensilRepositoryUnitTest
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            MinIntervalMinute = 5,
-            MaxIntervalMinute = 30,
-            IntervalMinute = 15,
-            LockMinute = 14,
-            GameExternalId = "sports_book"
+            GameExternalId = "sports_book",
+            IntervalMinutes = 5,
+            IntervalMinutesMax = 30,
+            IntervalMinutesMinimum = 1,
+            LockMinute = 4
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -181,11 +181,11 @@ public class UtensilRepositoryUnitTest
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            MinIntervalMinute = 5,
-            MaxIntervalMinute = 30,
-            IntervalMinute = 15,
-            LockMinute = 14,
-            GameExternalId = "sports_book"
+            GameExternalId = "sports_book",
+            IntervalMinutes = 5,
+            IntervalMinutesMax = 30,
+            IntervalMinutesMinimum = 1,
+            LockMinute = 4
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -223,11 +223,11 @@ public class UtensilRepositoryUnitTest
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            MinIntervalMinute = 5,
-            MaxIntervalMinute = 30,
-            IntervalMinute = 15,
-            LockMinute = 14,
-            GameExternalId = "sports_book"
+            GameExternalId = "sports_book",
+            IntervalMinutes = 5,
+            IntervalMinutesMax = 30,
+            IntervalMinutesMinimum = 1,
+            LockMinute = 4
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();

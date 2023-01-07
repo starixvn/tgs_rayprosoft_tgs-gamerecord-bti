@@ -8,11 +8,11 @@ data:
     {
       "GameRecordInfo": {
         "GameProviderCode": "BTI",
-        "MinIntervalMinute": 5,
-        "MaxIntervalMinute": 30,
-        "IntervalMinute": 15,
-        "LockMinute": 14,
-        "GameExternalId": "sports_book"
+        "GameExternalId": "sports_book",
+        "IntervalMinutes": 15,
+        "IntervalMinutesMax": 30,
+        "IntervalMinutesMinimum": 5,
+        "LockMinute": 14
       },
       "GameRecord": {
          "GameCommandClientBaseUrl": "http://game-gamecommand/",
