@@ -6,20 +6,15 @@ using Tgs.GameCommand.Common;
 
 namespace Tgs.GameRecord.BTiService.Core.UnitTest;
 
-[TestClass]
 public class UtensilRepositoryUnitTest
 {
-    [TestMethod]
+    [Fact]
     public async Task Get_Brand_GameProvider_Configuration_Id()
     {
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            GameExternalId = "sports_book",
-            IntervalMinutes = 5,
-            IntervalMinutesMax = 30,
-            IntervalMinutesMinimum = 1,
-            LockMinute = 4
+            GameExternalId = "sports_book"
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -56,9 +51,9 @@ public class UtensilRepositoryUnitTest
                 gameProviderId)
             .ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.IsTrue(actual.HasValue);
-        Assert.AreEqual(gameProviderConfigurationId, actual.Value);
+        Assert.NotNull(actual);
+        Assert.True(actual.HasValue);
+        Assert.Equal(gameProviderConfigurationId, actual.Value);
 
         _ = fakeMemoryCache
             .Received(1)
@@ -67,24 +62,26 @@ public class UtensilRepositoryUnitTest
                 gameProviderConfigurationId);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_Game_Id()
     {
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            GameExternalId = "sports_book",
-            IntervalMinutes = 5,
-            IntervalMinutesMax = 30,
-            IntervalMinutesMinimum = 1,
-            LockMinute = 4
+            GameExternalId = "sports_book"
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
         var absoluteExpirationRelativeToNow = TimeSpan.FromHours(1);
 
         var gameProviderId = Guid.NewGuid();
-        var gameExternalId = "1";
+        _ = fakeClient
+            .GameProviderGetGameProviderIdAsync(
+                gameProviderCode: Arg.Is(gameRecordInfo.Value.GameProviderCode),
+                cancellationToken: Arg.Any<CancellationToken>())
+            .Returns(gameProviderId);
+
+        var gameExternalId = gameRecordInfo.Value.GameExternalId;
 
         var key = $"gamerecord:{gameRecordInfo.Value.GameProviderCode}:{gameProviderId}:{gameExternalId}";
 
@@ -109,13 +106,10 @@ public class UtensilRepositoryUnitTest
             absoluteExpirationRelativeToNow);
 
         var actual = await repository
-            .GetGameIdAsync(
-                gameProviderId,
-                gameExternalId)
+            .GetGameIdAsync()
             .ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(gameId, actual);
+        Assert.Equal(gameId, actual);
 
         _ = fakeMemoryCache
             .Received(1)
@@ -124,17 +118,13 @@ public class UtensilRepositoryUnitTest
                 gameId);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_GameProvider_Id()
     {
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            GameExternalId = "sports_book",
-            IntervalMinutes = 5,
-            IntervalMinutesMax = 30,
-            IntervalMinutesMinimum = 1,
-            LockMinute = 4
+            GameExternalId = "sports_book"
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -165,8 +155,7 @@ public class UtensilRepositoryUnitTest
             .GetGameProviderIdAsync()
             .ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(gameProviderId, actual);
+        Assert.Equal(gameProviderId, actual);
 
         _ = fakeMemoryCache
             .Received(1)
@@ -175,17 +164,13 @@ public class UtensilRepositoryUnitTest
                 gameProviderId);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_GameProvider_Id_Exception()
     {
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            GameExternalId = "sports_book",
-            IntervalMinutes = 5,
-            IntervalMinutesMax = 30,
-            IntervalMinutesMinimum = 1,
-            LockMinute = 4
+            GameExternalId = "sports_book"
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -211,23 +196,19 @@ public class UtensilRepositoryUnitTest
             fakeMemoryCache,
             absoluteExpirationRelativeToNow);
 
-        _ = await Assert.ThrowsExceptionAsync<Exception>(() => repository
+        _ = await Assert.ThrowsAsync<Exception>(() => repository
              .GetGameProviderIdAsync()
              .AsTask())
              .ConfigureAwait(false);
     }
 
-    [TestMethod]
+    [Fact]
     public async Task Get_Player()
     {
         var gameRecordInfo = Options.Create(new GameRecordInfoOptions
         {
             GameProviderCode = "BTI",
-            GameExternalId = "sports_book",
-            IntervalMinutes = 5,
-            IntervalMinutesMax = 30,
-            IntervalMinutesMinimum = 1,
-            LockMinute = 4
+            GameExternalId = "sports_book"
         });
         var fakeClient = Substitute.For<IGameCommandClient>();
         var fakeMemoryCache = Substitute.For<IMemoryCache>();
@@ -271,8 +252,8 @@ public class UtensilRepositoryUnitTest
                 playerCode: playerCode)
             .ConfigureAwait(false);
 
-        Assert.IsNotNull(actual);
-        Assert.AreEqual(playerCode, player.PlayerCode);
+        Assert.NotNull(actual);
+        Assert.Equal(playerCode, player.PlayerCode);
 
         _ = fakeMemoryCache
             .Received(1)

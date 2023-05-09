@@ -4,9 +4,9 @@ using Tgs.GameRecord.BTiService.Core;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
-public static class GameRecordRegisterExtensions
+public static class ServiceRegisterExtensions
 {
-    public static async Task<WebApplication> UseGameRecordRegister(this WebApplication app)
+    public static async Task<WebApplication> UseRegister(this WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
@@ -14,10 +14,8 @@ public static class GameRecordRegisterExtensions
             var utensil = scope.ServiceProvider.GetRequiredService<IUtensil>();
             var gameProviderId = await utensil.GetGameProviderIdAsync().ConfigureAwait(false);
             _ = await utensil
-                    .GetGameIdAsync(
-                        gameProviderId,
-                        gameRecordInfo.GameExternalId)
-                    .ConfigureAwait(false);
+                .GetGameIdAsync()
+                .ConfigureAwait(false);
         }
 
         return app;
