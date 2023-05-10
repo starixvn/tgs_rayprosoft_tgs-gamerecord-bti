@@ -52,11 +52,16 @@ internal class UtensilRepository : IUtensil
         return gameProviderConfigurationId;
     }
 
+    public string GetGameExternalId()
+        => _gameRecordInfo.GameExternalId;
+
     public async ValueTask<int> GetGameIdAsync(
-        Guid gameProviderId,
-        string gameExternalId,
         CancellationToken cancellationToken = default)
     {
+        var gameProviderId = await GetGameProviderIdAsync(
+                cancellationToken: cancellationToken)
+            .ConfigureAwait(false);
+        var gameExternalId = _gameRecordInfo.GameExternalId;
         var key = $"gamerecord:{_gameRecordInfo.GameProviderCode}:{gameProviderId}:{gameExternalId}";
         if (!_memoryCache.TryGetValue(key, out int? gameId))
         {
@@ -78,6 +83,9 @@ internal class UtensilRepository : IUtensil
         }
         return gameId ?? throw new Exception($"This game does not exist.({gameExternalId})");
     }
+
+    public string GetGameProviderCode()
+        => _gameRecordInfo.GameProviderCode;
 
     public async ValueTask<Guid> GetGameProviderIdAsync(
         CancellationToken cancellationToken = default)
