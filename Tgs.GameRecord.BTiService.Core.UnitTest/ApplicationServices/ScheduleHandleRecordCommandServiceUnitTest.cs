@@ -128,7 +128,7 @@ public class ScheduleHandleRecordCommandServiceUnitTest
                 brandId: Arg.Is(command.GameRecord.BrandId),
                 gameProviderConfigurationId: Arg.Is(command.GameRecord.GameProviderConfigurationId),
                 status: Arg.Is(RoundStatus.Closed),
-                clientStatus: Arg.Is(RoundClientStatus.Win),
+                clientStatus: Arg.Is(RoundClientStatus.Void),
                 externalCreatedOn: Arg.Is(command.GameRecord.ExternalCreatedOn),
                 externalClosedOn: Arg.Is(command.GameRecord.ExternalClosedOn),
                 bet: Arg.Is(command.GameRecord.Bet),
