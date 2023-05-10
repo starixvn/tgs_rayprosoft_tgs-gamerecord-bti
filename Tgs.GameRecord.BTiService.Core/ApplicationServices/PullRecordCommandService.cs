@@ -38,8 +38,8 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
                         openBetsApiUrl: command.OpenBetsApiUrl,
                         agentUserName: command.AgentUserName,
                         agentPassword: command.AgentPassword,
-                        startTime: command.StartTime.ToUniversalTime().DateTime,
-                        endTime: command.EndTime.ToUniversalTime().DateTime,
+                        startTime: command.StartTime.UtcDateTime,
+                        endTime: command.EndTime.UtcDateTime,
                         cancellationToken: cancellationToken)
                     .ToArrayAsync(cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
@@ -100,8 +100,8 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
                             historyBetsPagingApiUrl: command.HistoryBetsPagingApiUrl,
                             agentUserName: command.AgentUserName,
                             agentPassword: command.AgentPassword,
-                            startTime: command.StartTime.ToUniversalTime().DateTime,
-                            endTime: command.EndTime.ToUniversalTime().DateTime,
+                            startTime: command.StartTime.UtcDateTime,
+                            endTime: command.EndTime.UtcDateTime,
                             page: page,
                             pageLimit: pageLimit,
                             cancellationToken: cancellationToken)
