@@ -30,6 +30,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
 
     public async ValueTask ExecuteAsync(PullRecordCommand command, CancellationToken cancellationToken = default)
     {
+        /*
         try
         {
             var gameRecords = await _client
@@ -86,7 +87,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
         {
             _logger.LogError(ex, "LogOn:{logOn} | Action:GameHistoryUnsettledAsync | Message:Bti處理未結算過程中發生例外", DateTime.UtcNow.ToString("O"));
         }
-
+        */
         try
         {
             int page = 0;
