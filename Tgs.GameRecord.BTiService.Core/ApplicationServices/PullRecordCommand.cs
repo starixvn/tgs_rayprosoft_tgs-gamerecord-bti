@@ -1,6 +1,4 @@
-﻿using Tgs.GameRounds.Schedule.Protos;
-
-namespace Tgs.GameRecord.BTiService.Core.ApplicationServices;
+﻿namespace Tgs.GameRecord.BTiService.Core.ApplicationServices;
 
 public record PullRecordCommand(
     Uri TokenApiUrl,
@@ -9,5 +7,4 @@ public record PullRecordCommand(
     string AgentUserName,
     string AgentPassword,
     DateTimeOffset StartTime,
-    DateTimeOffset EndTime,
-    ScheduleFormSource Source);
+    DateTimeOffset EndTime);

@@ -77,8 +77,7 @@ internal class ScheduleFormDispatcher : IScheduleFormDispatcher
                 AgentUserName: parameter.AgentUserName,
                 AgentPassword: parameter.AgentPassword,
                 StartTime: parameter.StartTime.ToDateTimeOffset(),
-                EndTime: parameter.EndTime.ToDateTimeOffset(),
-                Source: scheduleForm.Source);
+                EndTime: parameter.EndTime.ToDateTimeOffset());
 
             _logger.LogInformation("LogOn:{logOn} execute the command:{command}", DateTime.Now.ToString("o"), command);
 
