@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Tgs.GameRecord.BTiService.Core.ApplicationServices;
 using Tgs.GameRecord.BTiService.ViewModels;
-using Tgs.GameRounds.Schedule.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.BTiService.Controllers;
@@ -44,7 +43,6 @@ public class BTiController : ControllerBase
                 AgentUserName: source.AgentUserName,
                 AgentPassword: source.AgentPassword,
                 StartTime: source.StartTime,
-                EndTime: source.EndTime,
-                Source: ScheduleFormSource.Manual),
+                EndTime: source.EndTime),
             cancellationToken: HttpContext.RequestAborted);
 }

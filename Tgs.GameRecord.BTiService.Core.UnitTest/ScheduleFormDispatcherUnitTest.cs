@@ -68,8 +68,7 @@ public class ScheduleFormDispatcherUnitTest
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
             StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset(),
-            Source: scheduleFormReply.Source);
+            EndTime: parameter.EndTime.ToDateTimeOffset());
 
         _ = fakePullRecord
            .ExecuteAsync(
@@ -185,8 +184,7 @@ public class ScheduleFormDispatcherUnitTest
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
             StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset(),
-            Source: scheduleFormReply.Source);
+            EndTime: parameter.EndTime.ToDateTimeOffset());
 
         await fakePullRecord
             .Received(1)
@@ -283,8 +281,7 @@ public class ScheduleFormDispatcherUnitTest
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
             StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset(),
-            Source: scheduleFormReply.Source);
+            EndTime: parameter.EndTime.ToDateTimeOffset());
 
         await fakePullRecord
             .Received(0)
