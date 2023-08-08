@@ -4,22 +4,22 @@ namespace Tgs.GameRecord.BTiService.Core;
 
 public interface IUtensil
 {
-    ValueTask<Guid?> GetBrandGameProviderConfigurationIdAsync(
+    ValueTask<Guid> GetBrandGameProviderConfigurationIdAsync(
         Guid brandId,
         Guid gameProviderId,
         CancellationToken cancellationToken = default);
 
-    string GetGameExternalId();
-
     ValueTask<int> GetGameIdAsync(
-            CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default);
+
+    string GetGameExternalId();
 
     string GetGameProviderCode();
 
     ValueTask<Guid> GetGameProviderIdAsync(
-            CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default);
 
-    ValueTask<PlayerInfo?> GetPlayerAsync(
+    ValueTask<PlayerInfo> GetPlayerAsync(
         string playerCode,
         CancellationToken cancellationToken = default);
 }

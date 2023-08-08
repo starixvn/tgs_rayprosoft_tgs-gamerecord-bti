@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
@@ -69,10 +70,10 @@ public class GameRecordUtensilUnitTest
 
         _ = fakeUtensil
             .GetBrandGameProviderConfigurationIdAsync(
-                brandId: Arg.Is(player.BrandId),
-                gameProviderId: Arg.Is(gameProviderId),
-                cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<Guid?>(null));
+            brandId: Arg.Is(player.BrandId),
+            gameProviderId: Arg.Is(gameProviderId),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Throws<Exception>();
 
         var externalGameId = "sports_book";
         _ = fakeUtensil
@@ -81,32 +82,14 @@ public class GameRecordUtensilUnitTest
 
         var gameRecordUtensil = new GameRecordUtensil(fakeUtensil);
 
-        var actual = await gameRecordUtensil
-             .SettlementConvertRecordAsync(
-                 source: source)
-             .ConfigureAwait(false);
+        _ = await Assert.ThrowsAsync<Exception>(
+            () => gameRecordUtensil
+            .SettlementConvertRecordAsync(
+                source: source)
+            .AsTask())
+            .ConfigureAwait(false);
 
-        Assert.NotNull(actual);
-        Assert.False(actual.Success);
-        Assert.Equal(gameProviderId, actual.GameProviderId);
-        Assert.Equal(gameProviderCode, actual.GameProviderCode);
-        Assert.Equal(source.ExternalRoundId, actual.ExternalRoundId);
-        Assert.Equal(gameId, actual.GameId);
-        Assert.Equal(externalGameId, actual.ExternalGameId);
-        Assert.Equal(source.PlayerCode, actual.PlayerCode);
-        Assert.Equal(player.DefaultWalletId, actual.WalletId);
-        Assert.Equal(player.DefaultWalletCurrencyCode, actual.CurrencyCode);
-        Assert.Equal(player.BrandId, actual.BrandId);
-        Assert.Equal(Guid.Empty, actual.GameProviderConfigurationId);
-        Assert.True(actual.Status != GameHistoryStatus.Opened);
-        Assert.Equal(source.ExternalCreatedOn.ToDateTimeOffset(), actual.ExternalCreatedOn);
-        Assert.Equal(source.ExternalClosedOn.ToDateTimeOffset(), actual.ExternalClosedOn);
-        Assert.Equal(source.Bet.ToDecimal().GetValueOrDefault(0), actual.Bet);
-        Assert.Equal(source.ValidBet.ToDecimal().GetValueOrDefault(0), actual.ValidBet);
-        Assert.Equal(source.ValidBet.ToDecimal().GetValueOrDefault(0), actual.Turnover);
-        Assert.Equal(source.PlayerWinLoss.ToDecimal().GetValueOrDefault(0), actual.WinLoss);
-        Assert.Equal(source.Settle.ToDecimal().GetValueOrDefault(0), actual.Settle);
-        Assert.Equal(source.AdditionalData, actual.AdditionalData);
+
     }
 
     [Fact]
@@ -419,9 +402,9 @@ public class GameRecordUtensilUnitTest
 
         _ = fakeUtensil
             .GetPlayerAsync(
-                playerCode: Arg.Is(source.PlayerCode),
-                cancellationToken: Arg.Any<CancellationToken>())
-            .Returns(ValueTask.FromResult<PlayerInfo?>(null));
+            playerCode: Arg.Is(source.PlayerCode),
+            cancellationToken: Arg.Any<CancellationToken>())
+            .Throws<Exception>();
 
         var gameId = 1;
         _ = fakeUtensil
@@ -436,31 +419,11 @@ public class GameRecordUtensilUnitTest
 
         var gameRecordUtensil = new GameRecordUtensil(fakeUtensil);
 
-        var actual = await gameRecordUtensil
-             .SettlementConvertRecordAsync(
-                 source: source)
-             .ConfigureAwait(false);
-
-        Assert.NotNull(actual);
-        Assert.False(actual.Success);
-        Assert.Equal(gameProviderId, actual.GameProviderId);
-        Assert.Equal(gameProviderCode, actual.GameProviderCode);
-        Assert.Equal(source.ExternalRoundId, actual.ExternalRoundId);
-        Assert.Equal(gameId, actual.GameId);
-        Assert.Equal(externalGameId, actual.ExternalGameId);
-        Assert.Equal(string.Empty, actual.PlayerCode);
-        Assert.Equal(Guid.Empty, actual.WalletId);
-        Assert.Equal(string.Empty, actual.CurrencyCode);
-        Assert.Equal(Guid.Empty, actual.BrandId);
-        Assert.Equal(Guid.Empty, actual.GameProviderConfigurationId);
-        Assert.True(actual.Status != GameHistoryStatus.Opened);
-        Assert.Equal(source.ExternalCreatedOn.ToDateTimeOffset(), actual.ExternalCreatedOn);
-        Assert.Equal(source.ExternalClosedOn.ToDateTimeOffset(), actual.ExternalClosedOn);
-        Assert.Equal(source.Bet.ToDecimal().GetValueOrDefault(0), actual.Bet);
-        Assert.Equal(source.ValidBet.ToDecimal().GetValueOrDefault(0), actual.ValidBet);
-        Assert.Equal(source.ValidBet.ToDecimal().GetValueOrDefault(0), actual.Turnover);
-        Assert.Equal(source.PlayerWinLoss.ToDecimal().GetValueOrDefault(0), actual.WinLoss);
-        Assert.Equal(source.Settle.ToDecimal().GetValueOrDefault(0), actual.Settle);
-        Assert.Equal(source.AdditionalData, actual.AdditionalData);
+        _ = await Assert.ThrowsAsync<Exception>(
+            () => gameRecordUtensil
+            .SettlementConvertRecordAsync(
+                source: source)
+            .AsTask())
+            .ConfigureAwait(false);
     }
 }
