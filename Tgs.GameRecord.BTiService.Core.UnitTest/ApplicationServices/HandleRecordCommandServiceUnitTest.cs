@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text.Json;
 using System.Threading;
 using NSubstitute;
 using Tgs.GameInterface.BTiService.Protos;
@@ -51,7 +50,7 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundBidding(
+            .RoundExchangeRateBiddingAsync(
                 gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
@@ -116,7 +115,7 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundBidding(
+            .RoundExchangeRateBiddingAsync(
                 gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
@@ -181,7 +180,7 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundBidding(
+            .RoundExchangeRateBiddingAsync(
                 gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
@@ -203,57 +202,6 @@ public class HandleRecordCommandServiceUnitTest
                 turnover: Arg.Is(command.GameRecord.Turnover),
                 playerWinLoss: Arg.Is(command.GameRecord.WinLoss),
                 additionalData: Arg.Is(command.GameRecord.AdditionalData),
-                cancellationToken: Arg.Any<CancellationToken>())
-            .ConfigureAwait(false);
-    }
-
-    [Fact]
-    public async void Normal_Process_Success_Is_False()
-    {
-        var fakeClient = Substitute.For<IGameRoundsWorkClient>();
-
-        var command = new HandleRecordCommand(
-            GameRecord: new RecordInfo(
-                Success: false,
-                GameProviderId: Guid.NewGuid(),
-                GameProviderCode: "BTI",
-                ExternalRoundId: "643583c37c18c573b57bbb2c",
-                GameId: 1,
-                ExternalGameId: "sports_book",
-                PlayerCode: "4uispltzj9d8",
-                WalletId: Guid.NewGuid(),
-                CurrencyCode: "PHP",
-                BrandId: Guid.NewGuid(),
-                GameProviderConfigurationId: Guid.NewGuid(),
-                Status: GameHistoryStatus.Won,
-                ExternalCreatedOn: DateTimeOffset.Parse("2023-05-10T04:38:56.602"),
-                ExternalClosedOn: DateTimeOffset.Parse("2023-05-10T04:44:56.009"),
-                Bet: 4m,
-                ValidBet: 4m,
-                Settle: 8.24m,
-                Commission: 0,
-                Turnover: 4m,
-                WinLoss: 4.24m,
-                AdditionalData: "{\"BetSettledDate\":\"2023-05-10T04:38:56.602\",\"BetStatus\":\"Won\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPB1\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-05-10T04:12:18.11\",\"Currency\":\"PHP\",\"CustomerID\":112910928,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"MerchantCustomerID\":\"4uiq47lurf6z\",\"NonCashOutAmount\":0,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"OddsStyleOfUser\":\"European\",\"PL\":4.24,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"443988629220675584\",\"RealMoneyAmount\":4.0,\"Return\":8.24,\"SearchDateTime\":\"2023-05-10T04:44:56.009\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Phoenix Suns\",\"BetID\":\"443988629220675585\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":2,\"BranchName\":\"Basketball\",\"CouponCode\":\"\",\"EncodedLineID\":\"0HC443242889859137536AMM\",\"EventDate\":\"2023-05-10T02:00:00\",\"EventTypeID\":39,\"EventTypeName\":\"Live Betting Spread\",\"GameID\":443242887480950784,\"HomeTeam\":\"Denver Nuggets\",\"IsLive\":1,\"IsNewLine\":0,\"LeagueID\":216474657157816320,\"LeagueName\":\"NBA\",\"LineID\":0,\"LineTypeID\":2,\"LineTypeName\":\"Spread\",\"LiveScore1\":104,\"LiveScore2\":80,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"Points\":19.5,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"118 : 102\",\"Status\":\"Won\",\"UpdateDate\":null,\"YourBet\":\"Phoenix Suns \\u002B19.5\",\"Isfreebet\":0,\"Isresettled\":0}],\"Status\":\"Won\",\"SystemName\":\"0/1\",\"TotalStake\":4.0,\"UpdateDate\":\"2023-05-10T04:38:56.602\",\"UserName\":\"4uiq47lurf6z\",\"ValidStake\":4.0}"
-                ));
-
-        var service = new HandleRecordCommandService(fakeClient);
-
-        await service
-            .ExecuteAsync(
-                command)
-            .ConfigureAwait(false);
-
-        await fakeClient
-            .Received(1)
-            .RoundMissing(
-                gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
-                gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
-                externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
-                gameId: Arg.Is(command.GameRecord.GameId),
-                externalGameId: Arg.Is(command.GameRecord.ExternalGameId),
-                playerCode: Arg.Is(command.GameRecord.PlayerCode),
-                data: Arg.Is(JsonSerializer.Serialize(command.GameRecord)),
                 cancellationToken: Arg.Any<CancellationToken>())
             .ConfigureAwait(false);
     }
@@ -297,7 +245,7 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundBidding(
+            .RoundExchangeRateBiddingAsync(
                 gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),

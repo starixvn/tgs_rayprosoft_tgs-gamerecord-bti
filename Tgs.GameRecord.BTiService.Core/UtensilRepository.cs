@@ -77,7 +77,6 @@ internal class UtensilRepository : IUtensil
             .Set(
                 key: key,
                 value: gameId);
-
         }
         return gameId;
     }

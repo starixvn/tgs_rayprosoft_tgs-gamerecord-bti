@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
@@ -88,8 +87,6 @@ public class GameRecordUtensilUnitTest
                 source: source)
             .AsTask())
             .ConfigureAwait(false);
-
-
     }
 
     [Fact]

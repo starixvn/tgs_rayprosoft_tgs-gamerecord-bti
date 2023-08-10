@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Tgs.GameInterface.BTiService.Protos;
+﻿using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRounds.Work.Client;
 using Tgs.GameRounds.Work.Common.Protos;
 using Tgs.ServiceUtility;
@@ -39,7 +38,7 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
             }
 
             await _client
-            .RoundBidding(
+            .RoundExchangeRateBiddingAsync(
                 gameProviderId: command.GameRecord.GameProviderId,
                 gameProviderCode: command.GameRecord.GameProviderCode,
                 externalRoundId: command.GameRecord.ExternalRoundId,
@@ -61,20 +60,6 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
                 turnover: command.GameRecord.Turnover,
                 playerWinLoss: command.GameRecord.WinLoss,
                 additionalData: command.GameRecord.AdditionalData,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-        }
-        else
-        {
-            await _client
-            .RoundMissing(
-                gameProviderId: command.GameRecord.GameProviderId,
-                gameProviderCode: command.GameRecord.GameProviderCode,
-                externalRoundId: command.GameRecord.ExternalRoundId,
-                gameId: command.GameRecord.GameId,
-                externalGameId: command.GameRecord.ExternalGameId,
-                playerCode: command.GameRecord.PlayerCode,
-                data: JsonSerializer.Serialize(command.GameRecord),
                 cancellationToken: cancellationToken)
             .ConfigureAwait(false);
         }

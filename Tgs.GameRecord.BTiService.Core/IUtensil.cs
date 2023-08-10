@@ -9,10 +9,10 @@ public interface IUtensil
         Guid gameProviderId,
         CancellationToken cancellationToken = default);
 
-    ValueTask<int> GetGameIdAsync(
-        CancellationToken cancellationToken = default);
-
     string GetGameExternalId();
+
+    ValueTask<int> GetGameIdAsync(
+            CancellationToken cancellationToken = default);
 
     string GetGameProviderCode();
 
