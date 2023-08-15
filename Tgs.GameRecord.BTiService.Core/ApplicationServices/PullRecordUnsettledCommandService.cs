@@ -51,11 +51,10 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
             _logger.LogDebug("LogOn:{logOn} Message: GameRecord Unsettlement. GameRecords:{gameRecord}", DateTime.Now.ToString("o"), gameRecord);
             try
             {
-                var record = await _gameRecordUtensil
-                    .UnsettledConvertRecordAsync(
+                var record = _gameRecordUtensil
+                    .UnsettledConvertRecord(
                     source: gameRecord,
-                    cancellationToken: cancellationToken)
-                    .ConfigureAwait(false);
+                    cancellationToken: cancellationToken);
 
                 _logger.LogDebug("LogOn:{logOn} Message: GameRecord Unsettlement. Record:{record}", DateTime.Now.ToString("o"), record);
 
@@ -67,7 +66,7 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "LogOn:{logOn} Message: GameRecord Unsettlement Exception. GameRecord:{gameRecord}", DateTime.Now.ToString("o"), gameRecord);
+                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({gameRecord})", DateTime.Now.ToString("o"), gameRecord);
             }
         }
     }

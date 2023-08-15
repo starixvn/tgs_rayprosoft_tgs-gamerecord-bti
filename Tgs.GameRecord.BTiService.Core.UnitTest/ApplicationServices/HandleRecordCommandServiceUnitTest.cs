@@ -4,8 +4,8 @@ using NSubstitute;
 using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.BTiService.Core.ApplicationServices;
 using Tgs.GameRecord.BTiService.Core.Models;
-using Tgs.GameRounds.Work.Client;
-using Tgs.GameRounds.Work.Common.Protos;
+using Tgs.GameRecord.Handle.Client;
+using Tgs.GameRecord.Handle.Common.Protos;
 
 namespace Tgs.GameRecord.BTiService.Core.UnitTest.ApplicationServices;
 
@@ -14,21 +14,14 @@ public class HandleRecordCommandServiceUnitTest
     [Fact]
     public async void Normal_Process_Settlement_Loss()
     {
-        var fakeClient = Substitute.For<IGameRoundsWorkClient>();
+        var fakeClient = Substitute.For<IGameRecordHandleClient>();
 
         var command = new HandleRecordCommand(
             GameRecord: new RecordInfo(
-                Success: true,
-                GameProviderId: Guid.NewGuid(),
                 GameProviderCode: "BTI",
                 ExternalRoundId: "444000837900083200",
-                GameId: 1,
                 ExternalGameId: "sports_book",
                 PlayerCode: "4uispltzj9d8",
-                WalletId: Guid.NewGuid(),
-                CurrencyCode: "PHP",
-                BrandId: Guid.NewGuid(),
-                GameProviderConfigurationId: Guid.NewGuid(),
                 Status: GameHistoryStatus.Lost,
                 ExternalCreatedOn: DateTimeOffset.Parse("2023-05-10T04:38:56.602"),
                 ExternalClosedOn: DateTimeOffset.Parse("2023-05-10T04:44:56.009"),
@@ -50,19 +43,13 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundExchangeRateBiddingAsync(
-                gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
+            .MessageAsync(
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
-                gameId: Arg.Is(command.GameRecord.GameId),
                 externalGameId: Arg.Is(command.GameRecord.ExternalGameId),
                 playerCode: Arg.Is(command.GameRecord.PlayerCode),
-                walletId: Arg.Is(command.GameRecord.WalletId),
-                currencyCode: Arg.Is(command.GameRecord.CurrencyCode),
-                brandId: Arg.Is(command.GameRecord.BrandId),
-                gameProviderConfigurationId: Arg.Is(command.GameRecord.GameProviderConfigurationId),
-                status: Arg.Is(RoundStatus.Closed),
-                clientStatus: Arg.Is(RoundClientStatus.Loss),
+                status: Arg.Is(GameRecordStatus.Closed),
+                clientStatus: Arg.Is(GameRecordClientStatus.Loss),
                 externalCreatedOn: Arg.Is(command.GameRecord.ExternalCreatedOn),
                 externalClosedOn: Arg.Is(command.GameRecord.ExternalClosedOn),
                 bet: Arg.Is(command.GameRecord.Bet),
@@ -79,21 +66,14 @@ public class HandleRecordCommandServiceUnitTest
     [Fact]
     public async void Normal_Process_Settlement_Void()
     {
-        var fakeClient = Substitute.For<IGameRoundsWorkClient>();
+        var fakeClient = Substitute.For<IGameRecordHandleClient>();
 
         var command = new HandleRecordCommand(
             GameRecord: new RecordInfo(
-                Success: true,
-                GameProviderId: Guid.NewGuid(),
                 GameProviderCode: "BTI",
                 ExternalRoundId: "438278232526213120",
-                GameId: 1,
                 ExternalGameId: "sports_book",
                 PlayerCode: "4uispltzj9d8",
-                WalletId: Guid.NewGuid(),
-                CurrencyCode: "PHP",
-                BrandId: Guid.NewGuid(),
-                GameProviderConfigurationId: Guid.NewGuid(),
                 Status: GameHistoryStatus.Canceled,
                 ExternalCreatedOn: DateTimeOffset.Parse("2023-04-24T10:51:48.852"),
                 ExternalClosedOn: DateTimeOffset.Parse("2023-04-24T10:56:27.861"),
@@ -115,19 +95,13 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundExchangeRateBiddingAsync(
-                gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
+            .MessageAsync(
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
-                gameId: Arg.Is(command.GameRecord.GameId),
                 externalGameId: Arg.Is(command.GameRecord.ExternalGameId),
                 playerCode: Arg.Is(command.GameRecord.PlayerCode),
-                walletId: Arg.Is(command.GameRecord.WalletId),
-                currencyCode: Arg.Is(command.GameRecord.CurrencyCode),
-                brandId: Arg.Is(command.GameRecord.BrandId),
-                gameProviderConfigurationId: Arg.Is(command.GameRecord.GameProviderConfigurationId),
-                status: Arg.Is(RoundStatus.Closed),
-                clientStatus: Arg.Is(RoundClientStatus.Void),
+                status: Arg.Is(GameRecordStatus.Closed),
+                clientStatus: Arg.Is(GameRecordClientStatus.Void),
                 externalCreatedOn: Arg.Is(command.GameRecord.ExternalCreatedOn),
                 externalClosedOn: Arg.Is(command.GameRecord.ExternalClosedOn),
                 bet: Arg.Is(command.GameRecord.Bet),
@@ -144,21 +118,14 @@ public class HandleRecordCommandServiceUnitTest
     [Fact]
     public async void Normal_Process_Settlement_Win()
     {
-        var fakeClient = Substitute.For<IGameRoundsWorkClient>();
+        var fakeClient = Substitute.For<IGameRecordHandleClient>();
 
         var command = new HandleRecordCommand(
             GameRecord: new RecordInfo(
-                Success: true,
-                GameProviderId: Guid.NewGuid(),
                 GameProviderCode: "BTI",
                 ExternalRoundId: "643583c37c18c573b57bbb2c",
-                GameId: 1,
                 ExternalGameId: "sports_book",
                 PlayerCode: "4uispltzj9d8",
-                WalletId: Guid.NewGuid(),
-                CurrencyCode: "PHP",
-                BrandId: Guid.NewGuid(),
-                GameProviderConfigurationId: Guid.NewGuid(),
                 Status: GameHistoryStatus.Won,
                 ExternalCreatedOn: DateTimeOffset.Parse("2023-05-10T04:38:56.602"),
                 ExternalClosedOn: DateTimeOffset.Parse("2023-05-10T04:44:56.009"),
@@ -180,19 +147,13 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundExchangeRateBiddingAsync(
-                gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
+            .MessageAsync(
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
-                gameId: Arg.Is(command.GameRecord.GameId),
                 externalGameId: Arg.Is(command.GameRecord.ExternalGameId),
                 playerCode: Arg.Is(command.GameRecord.PlayerCode),
-                walletId: Arg.Is(command.GameRecord.WalletId),
-                currencyCode: Arg.Is(command.GameRecord.CurrencyCode),
-                brandId: Arg.Is(command.GameRecord.BrandId),
-                gameProviderConfigurationId: Arg.Is(command.GameRecord.GameProviderConfigurationId),
-                status: Arg.Is(RoundStatus.Closed),
-                clientStatus: Arg.Is(RoundClientStatus.Win),
+                status: Arg.Is(GameRecordStatus.Closed),
+                clientStatus: Arg.Is(GameRecordClientStatus.Win),
                 externalCreatedOn: Arg.Is(command.GameRecord.ExternalCreatedOn),
                 externalClosedOn: Arg.Is(command.GameRecord.ExternalClosedOn),
                 bet: Arg.Is(command.GameRecord.Bet),
@@ -209,21 +170,14 @@ public class HandleRecordCommandServiceUnitTest
     [Fact]
     public async void Normal_Process_Unsettlement()
     {
-        var fakeClient = Substitute.For<IGameRoundsWorkClient>();
+        var fakeClient = Substitute.For<IGameRecordHandleClient>();
 
         var command = new HandleRecordCommand(
             GameRecord: new RecordInfo(
-                Success: true,
-                GameProviderId: Guid.NewGuid(),
                 GameProviderCode: "BTI",
                 ExternalRoundId: "643583c37c18c573b57bbb2c",
-                GameId: 1,
                 ExternalGameId: "sports_book",
                 PlayerCode: "4uispltzj9d8",
-                WalletId: Guid.NewGuid(),
-                CurrencyCode: "PHP",
-                BrandId: Guid.NewGuid(),
-                GameProviderConfigurationId: Guid.NewGuid(),
                 Status: GameHistoryStatus.Opened,
                 ExternalCreatedOn: DateTimeOffset.Parse("2023-05-10T05:03:04.111"),
                 ExternalClosedOn: null,
@@ -245,19 +199,13 @@ public class HandleRecordCommandServiceUnitTest
 
         await fakeClient
             .Received(1)
-            .RoundExchangeRateBiddingAsync(
-                gameProviderId: Arg.Is(command.GameRecord.GameProviderId),
+            .MessageAsync(
                 gameProviderCode: Arg.Is(command.GameRecord.GameProviderCode),
                 externalRoundId: Arg.Is(command.GameRecord.ExternalRoundId),
-                gameId: Arg.Is(command.GameRecord.GameId),
                 externalGameId: Arg.Is(command.GameRecord.ExternalGameId),
                 playerCode: Arg.Is(command.GameRecord.PlayerCode),
-                walletId: Arg.Is(command.GameRecord.WalletId),
-                currencyCode: Arg.Is(command.GameRecord.CurrencyCode),
-                brandId: Arg.Is(command.GameRecord.BrandId),
-                gameProviderConfigurationId: Arg.Is(command.GameRecord.GameProviderConfigurationId),
-                status: Arg.Is(RoundStatus.Open),
-                clientStatus: Arg.Is(RoundClientStatus.Open),
+                status: Arg.Is(GameRecordStatus.Open),
+                clientStatus: Arg.Is(GameRecordClientStatus.Open),
                 externalCreatedOn: Arg.Is(command.GameRecord.ExternalCreatedOn),
                 externalClosedOn: Arg.Is(command.GameRecord.ExternalClosedOn),
                 bet: Arg.Is(command.GameRecord.Bet),

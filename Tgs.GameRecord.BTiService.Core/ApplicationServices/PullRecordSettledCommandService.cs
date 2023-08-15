@@ -63,11 +63,10 @@ internal class PullRecordSettledCommandService : ICommandService<PullRecordSettl
                 _logger.LogDebug("LogOn:{logOn} Message: GameRecord Settlement. GameRecords:{gameRecord}", DateTime.Now.ToString("o"), gameRecord);
                 try
                 {
-                    var record = await _gameRecordUtensil
-                        .SettlementConvertRecordAsync(
+                    var record = _gameRecordUtensil
+                        .SettlementConvertRecord(
                         source: gameRecord,
-                        cancellationToken: cancellationToken)
-                        .ConfigureAwait(false);
+                        cancellationToken: cancellationToken);
 
                     _logger.LogDebug("LogOn:{logOn} Message: GameRecord Settlement. Record:{record}", DateTime.Now.ToString("o"), record);
 
@@ -79,7 +78,7 @@ internal class PullRecordSettledCommandService : ICommandService<PullRecordSettl
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "LogOn:{logOn} Message: GameRecord Settlement Exception. GameRecord:{gameRecord}", DateTime.Now.ToString("o"), gameRecord);
+                    _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({gameRecord})", DateTime.Now.ToString("o"), gameRecord);
                 }
             }
 

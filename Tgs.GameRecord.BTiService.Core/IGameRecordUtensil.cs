@@ -5,11 +5,11 @@ namespace Tgs.GameRecord.BTiService.Core;
 
 public interface IGameRecordUtensil
 {
-    public ValueTask<RecordInfo> SettlementConvertRecordAsync(
+    RecordInfo SettlementConvertRecord(
         GameHistorySettled source,
         CancellationToken cancellationToken = default);
 
-    public ValueTask<RecordInfo> UnsettledConvertRecordAsync(
+    RecordInfo UnsettledConvertRecord(
         GameHistoryUnsettled source,
         CancellationToken cancellationToken = default);
 }

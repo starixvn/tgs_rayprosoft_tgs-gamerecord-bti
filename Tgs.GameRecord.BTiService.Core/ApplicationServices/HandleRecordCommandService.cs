@@ -1,67 +1,60 @@
 ﻿using Tgs.GameInterface.BTiService.Protos;
-using Tgs.GameRounds.Work.Client;
-using Tgs.GameRounds.Work.Common.Protos;
+using Tgs.GameRecord.Handle.Client;
+using Tgs.GameRecord.Handle.Common.Protos;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.BTiService.Core.ApplicationServices;
 
 internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
 {
-    private readonly IGameRoundsWorkClient _client;
+    private readonly IGameRecordHandleClient _client;
 
     public HandleRecordCommandService(
-        IGameRoundsWorkClient client)
+        IGameRecordHandleClient client)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
     public async ValueTask ExecuteAsync(HandleRecordCommand command, CancellationToken cancellationToken = default)
     {
-        if (command.GameRecord.Success)
-        {
-            var status = RoundStatus.Open;
-            var clientStatus = RoundClientStatus.Open;
-            if (command.GameRecord.Status != GameHistoryStatus.Opened)
-            {
-                status = RoundStatus.Closed;
-                clientStatus =
-                command.GameRecord.Status switch
-                {
-                    GameHistoryStatus.Draw => RoundClientStatus.Draw,
-                    GameHistoryStatus.Declined => RoundClientStatus.Draw,
-                    GameHistoryStatus.Canceled => RoundClientStatus.Void,
-                    GameHistoryStatus.Won => RoundClientStatus.Win,
-                    GameHistoryStatus.HalfWon => RoundClientStatus.Win,
-                    GameHistoryStatus.HalfLost => RoundClientStatus.Loss,
-                    _ => (command.GameRecord.WinLoss > 0) ? RoundClientStatus.Win : RoundClientStatus.Loss
-                };
-            }
 
-            await _client
-            .RoundExchangeRateBiddingAsync(
-                gameProviderId: command.GameRecord.GameProviderId,
-                gameProviderCode: command.GameRecord.GameProviderCode,
-                externalRoundId: command.GameRecord.ExternalRoundId,
-                gameId: command.GameRecord.GameId,
-                externalGameId: command.GameRecord.ExternalGameId,
-                playerCode: command.GameRecord.PlayerCode,
-                walletId: command.GameRecord.WalletId,
-                currencyCode: command.GameRecord.CurrencyCode,
-                brandId: command.GameRecord.BrandId,
-                gameProviderConfigurationId: command.GameRecord.GameProviderConfigurationId,
-                status: status,
-                clientStatus: clientStatus,
-                externalCreatedOn: command.GameRecord.ExternalCreatedOn,
-                externalClosedOn: command.GameRecord.ExternalClosedOn,
-                bet: command.GameRecord.Bet,
-                validBet: command.GameRecord.ValidBet,
-                settle: command.GameRecord.Settle,
-                commission: command.GameRecord.Commission,
-                turnover: command.GameRecord.Turnover,
-                playerWinLoss: command.GameRecord.WinLoss,
-                additionalData: command.GameRecord.AdditionalData,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
+        var status = GameRecordStatus.Open;
+        var clientStatus = GameRecordClientStatus.Open;
+        if (command.GameRecord.Status != GameHistoryStatus.Opened)
+        {
+            status = GameRecordStatus.Closed;
+            clientStatus =
+            command.GameRecord.Status switch
+            {
+                GameHistoryStatus.Draw => GameRecordClientStatus.Draw,
+                GameHistoryStatus.Declined => GameRecordClientStatus.Draw,
+                GameHistoryStatus.Canceled => GameRecordClientStatus.Void,
+                GameHistoryStatus.Won => GameRecordClientStatus.Win,
+                GameHistoryStatus.HalfWon => GameRecordClientStatus.Win,
+                GameHistoryStatus.HalfLost => GameRecordClientStatus.Loss,
+                _ => (command.GameRecord.WinLoss > 0) ? GameRecordClientStatus.Win : GameRecordClientStatus.Loss
+            };
         }
+
+        await _client
+        .MessageAsync(
+            gameProviderCode: command.GameRecord.GameProviderCode,
+            externalRoundId: command.GameRecord.ExternalRoundId,
+            externalGameId: command.GameRecord.ExternalGameId,
+            playerCode: command.GameRecord.PlayerCode,
+            status: status,
+            clientStatus: clientStatus,
+            externalCreatedOn: command.GameRecord.ExternalCreatedOn,
+            externalClosedOn: command.GameRecord.ExternalClosedOn,
+            bet: command.GameRecord.Bet,
+            validBet: command.GameRecord.ValidBet,
+            settle: command.GameRecord.Settle,
+            commission: command.GameRecord.Commission,
+            turnover: command.GameRecord.Turnover,
+            playerWinLoss: command.GameRecord.WinLoss,
+            additionalData: command.GameRecord.AdditionalData,
+            cancellationToken: cancellationToken)
+        .ConfigureAwait(false);
+
     }
 }

@@ -13,51 +13,11 @@ internal class GameRecordUtensil : IGameRecordUtensil
         _utensil = utensil ?? throw new ArgumentNullException(nameof(utensil));
     }
 
-    public async ValueTask<RecordInfo> SettlementConvertRecordAsync(
+    public RecordInfo SettlementConvertRecord(
         GameHistorySettled source,
         CancellationToken cancellationToken = default)
     {
-        var gameProviderId = await _utensil
-            .GetGameProviderIdAsync(
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var gameProviderCode = _utensil
-            .GetGameProviderCode();
-
-        bool success = true;
-
-        var player = await _utensil
-            .GetPlayerAsync(
-                playerCode: source.PlayerCode,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var gameId = await _utensil
-            .GetGameIdAsync(
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        if (player == null)
-        {
-            success = false;
-        }
-
-        Guid? gameProviderConfigurationId = default;
-        if (player != null)
-        {
-            gameProviderConfigurationId = await _utensil
-                .GetBrandGameProviderConfigurationIdAsync(
-                    brandId: player.BrandId,
-                    gameProviderId: gameProviderId,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-            if (!gameProviderConfigurationId.HasValue)
-            {
-                success = false;
-            }
-        }
-
+        var gameProviderCode = _utensil.GetGameProviderCode();
         var externalCreatedOn = source.ExternalCreatedOn.ToDateTimeOffset();
         DateTimeOffset? externalClosedOn = source.IsClosed ? source.ExternalClosedOn.ToDateTimeOffset() : null;
         var bet = source.Bet.ToDecimal().GetValueOrDefault(0);
@@ -68,17 +28,10 @@ internal class GameRecordUtensil : IGameRecordUtensil
         var winLoss = source.PlayerWinLoss.ToDecimal().GetValueOrDefault(0);
 
         return new RecordInfo(
-            Success: success,
-            GameProviderId: gameProviderId,
             GameProviderCode: gameProviderCode,
             ExternalRoundId: source.ExternalRoundId,
-            GameId: gameId,
             ExternalGameId: _utensil.GetGameExternalId(),
-            PlayerCode: (player == null) ? string.Empty : player.PlayerCode,
-            WalletId: (player == null) ? Guid.Empty : player.DefaultWalletId,
-            CurrencyCode: (player == null) ? string.Empty : player.DefaultWalletCurrencyCode,
-            BrandId: (player == null) ? Guid.Empty : player.BrandId,
-            GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
+            PlayerCode: source.PlayerCode,
             Status: source.Status,
             ExternalCreatedOn: externalCreatedOn,
             ExternalClosedOn: externalClosedOn,
@@ -91,51 +44,11 @@ internal class GameRecordUtensil : IGameRecordUtensil
             AdditionalData: source.AdditionalData);
     }
 
-    public async ValueTask<RecordInfo> UnsettledConvertRecordAsync(
+    public RecordInfo UnsettledConvertRecord(
         GameHistoryUnsettled source,
         CancellationToken cancellationToken = default)
     {
-        var gameProviderId = await _utensil
-            .GetGameProviderIdAsync(
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var gameProviderCode = _utensil
-            .GetGameProviderCode();
-
-        bool success = true;
-
-        var player = await _utensil
-            .GetPlayerAsync(
-                playerCode: source.PlayerCode,
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        var gameId = await _utensil
-            .GetGameIdAsync(
-                cancellationToken: cancellationToken)
-            .ConfigureAwait(false);
-
-        if (player == null)
-        {
-            success = false;
-        }
-
-        Guid? gameProviderConfigurationId = default;
-        if (player != null)
-        {
-            gameProviderConfigurationId = await _utensil
-                .GetBrandGameProviderConfigurationIdAsync(
-                    brandId: player.BrandId,
-                    gameProviderId: gameProviderId,
-                    cancellationToken: cancellationToken)
-                .ConfigureAwait(false);
-            if (!gameProviderConfigurationId.HasValue)
-            {
-                success = false;
-            }
-        }
-
+        var gameProviderCode = _utensil.GetGameProviderCode();
         var externalCreatedOn = source.ExternalCreatedOn.ToDateTimeOffset();
         DateTimeOffset? externalClosedOn = null;
         var bet = source.Bet.ToDecimal().GetValueOrDefault(0);
@@ -146,17 +59,10 @@ internal class GameRecordUtensil : IGameRecordUtensil
         var winLoss = 0;
 
         return new RecordInfo(
-            Success: success,
-            GameProviderId: gameProviderId,
             GameProviderCode: gameProviderCode,
             ExternalRoundId: source.ExternalRoundId,
-            GameId: gameId,
             ExternalGameId: _utensil.GetGameExternalId(),
-            PlayerCode: (player == null) ? string.Empty : player.PlayerCode,
-            WalletId: (player == null) ? Guid.Empty : player.DefaultWalletId,
-            CurrencyCode: (player == null) ? string.Empty : player.DefaultWalletCurrencyCode,
-            BrandId: (player == null) ? Guid.Empty : player.BrandId,
-            GameProviderConfigurationId: gameProviderConfigurationId ?? Guid.Empty,
+            PlayerCode: source.PlayerCode,
             Status: GameHistoryStatus.Opened,
             ExternalCreatedOn: externalCreatedOn,
             ExternalClosedOn: externalClosedOn,
