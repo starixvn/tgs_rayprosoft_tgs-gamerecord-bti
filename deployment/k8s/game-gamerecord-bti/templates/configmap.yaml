@@ -1,7 +1,7 @@
 ﻿apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: configmap-{{ include "game-gamerecord-bti-service.name" . }}
+  name: configmap-{{ include "game-gamerecord-bti.name" . }}
   namespace: {{ .Values.namespace }}
 data:
   appsettings.json: |

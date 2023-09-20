@@ -1,8 +1,8 @@
 variables:
-  ImageName: pgtgs/game-gamerecord-bti-service
-  SettingKey: game-gamerecord-bti-service
-  HelmTemplateFolderName: game-gamerecord-bti-service
-  BuildCacheKey: Tgs.GameRecord.BTiService.$CI_PIPELINE_ID
+  ImageName: pgtgs/game-gamerecord-bti
+  SettingKey: game-gamerecord-bti
+  HelmTemplateFolderName: game-gamerecord-bti
+  BuildCacheKey: Tgs.GameRecord.BTi.$CI_PIPELINE_ID
 
 default:
   before_script:
@@ -59,7 +59,7 @@ push-docker-image:
     untracked: true   
     policy: pull
   script:
-    - dotnet build "Tgs.GameRecord.BTiService/Tgs.GameRecord.BTiService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
+    - dotnet build "Tgs.GameRecord.BTi/Tgs.GameRecord.BTi.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$Tag" --no-restore
     - docker push $ImageName:$Tag
 
 push-k8s-template:
@@ -101,8 +101,8 @@ deploy-dev:
     - export KUBECONFIG=$KubeConfig_Raypro_dev
   script:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$SettingKey})
-    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
-    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated_game})
+    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector_game})
     - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$SettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \
@@ -148,8 +148,8 @@ deploy-staging:
     - export KUBECONFIG=$KubeConfig_Raypro_staging
   script:
     - export resources=$(kubectl get cm resources-setting -o jsonpath={.data.$SettingKey})
-    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated})
-    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector})
+    - export dedicated=$(kubectl get cm tgs-settings -o jsonpath={.data.dedicated_game})
+    - export node_selector=$(kubectl get cm tgs-settings -o jsonpath={.data.node-selector_game})
     - export autoscaling=$(kubectl get cm autoscaling-setting -o jsonpath={.data.$SettingKey})
     - |
       cat << EOF | yq e -P | helm template artifacts/k8s/$HelmTemplateFolderName \

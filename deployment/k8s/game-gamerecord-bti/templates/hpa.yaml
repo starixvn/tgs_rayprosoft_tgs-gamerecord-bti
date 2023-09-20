@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "game-gamerecord-bti-service.fullname" . }}
+  name: {{ include "game-gamerecord-bti.fullname" . }}
   labels:
-    {{- include "game-gamerecord-bti-service.labels" . | nindent 4 }}
+    {{- include "game-gamerecord-bti.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "game-gamerecord-bti-service.fullname" . }}
+    name: {{ include "game-gamerecord-bti.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
