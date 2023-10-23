@@ -10,6 +10,7 @@ ARG BuildConfiguration=Release
 WORKDIR /src
 COPY ["nuget.config", "."]
 COPY ["Tgs.GameRecord.BTi/Tgs.GameRecord.BTi.csproj", "Tgs.GameRecord.BTi/"]
+COPY ["Tgs.GameRecord.BTi.Common/Tgs.GameRecord.BTi.Common.csproj", "Tgs.GameRecord.BTi.Common/"]
 COPY ["Tgs.GameRecord.BTi.Core/Tgs.GameRecord.BTi.Core.csproj", "Tgs.GameRecord.BTi.Core/"]
 RUN dotnet restore "Tgs.GameRecord.BTi/Tgs.GameRecord.BTi.csproj"
 COPY . .
