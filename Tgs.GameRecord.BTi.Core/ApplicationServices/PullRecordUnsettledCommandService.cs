@@ -8,28 +8,24 @@ namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
 internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUnsettledCommand>
 {
     private readonly IGameInterfaceBTiClient _client;
-    private readonly IGameRecordUtensil _gameRecordUtensil;
     private readonly ILogger<PullRecordUnsettledCommandService> _logger;
     private readonly ICommandService<HandleRecordCommand> _service;
 
     public PullRecordUnsettledCommandService(
         ILogger<PullRecordUnsettledCommandService> logger,
         IGameInterfaceBTiClient client,
-        IGameRecordUtensil gameRecordUtensil,
         ICommandService<HandleRecordCommand> service)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _client = client ?? throw new ArgumentNullException(nameof(client));
-        _gameRecordUtensil = gameRecordUtensil ?? throw new ArgumentNullException(nameof(gameRecordUtensil));
         _service = service ?? throw new ArgumentNullException(nameof(service));
     }
 
     public async ValueTask ExecuteAsync(PullRecordUnsettledCommand command, CancellationToken cancellationToken = default)
     {
-        var gameRecords = await _client
-            .GameHistoryUnsettledAsync(
-            tokenApiUrl: command.TokenApiUrl,
-            openBetsApiUrl: command.OpenBetsApiUrl,
+        var infos = await _client
+            .GameWagerUnsettledAsync(
+            dataApiUrl: command.DataApiUrl,
             agentUserName: command.AgentUserName,
             agentPassword: command.AgentPassword,
             startTime: command.StartTime.UtcDateTime,
@@ -37,36 +33,29 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
             cancellationToken: cancellationToken)
             .ToArrayAsync(cancellationToken: cancellationToken)
             .ConfigureAwait(false)
-            ?? Enumerable.Empty<GameHistoryUnsettled>();
+            ?? Enumerable.Empty<GameWagerInfo>();
 
-        _logger.LogDebug("LogOn:{logOn} Message: GameRecord Unsettlement. GameRecords:{gameRecords}", DateTime.Now.ToString("o"), gameRecords);
+        _logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. Infos:{infos}", DateTime.Now.ToString("o"), infos);
 
-        if (!gameRecords.Any())
+        if (!infos.Any())
         {
             return;
         }
 
-        foreach (var gameRecord in gameRecords)
+        foreach (var info in infos)
         {
-            _logger.LogDebug("LogOn:{logOn} Message: GameRecord Unsettlement. GameRecords:{gameRecord}", DateTime.Now.ToString("o"), gameRecord);
+            _logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. GameWager:{info}", DateTime.Now.ToString("o"), info);
             try
             {
-                var record = _gameRecordUtensil
-                    .UnsettledConvertRecord(
-                    source: gameRecord,
-                    cancellationToken: cancellationToken);
-
-                _logger.LogDebug("LogOn:{logOn} Message: GameRecord Unsettlement. Record:{record}", DateTime.Now.ToString("o"), record);
-
                 await _service
                     .ExecuteAsync(
-                    command: new(GameRecord: record),
+                    command: new(Info: info),
                     cancellationToken: cancellationToken)
                     .ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({gameRecord})", DateTime.Now.ToString("o"), gameRecord);
+                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
             }
         }
     }

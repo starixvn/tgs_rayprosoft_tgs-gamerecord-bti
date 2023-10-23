@@ -78,15 +78,9 @@ internal class JobInitCommandService : ICommandService<JobInitCommand>
                 var configurationDataJson = JsonNode.Parse(gameProviderConfig.ConfigurationData)
                     ?? throw new Exception($"Game Provider Configuration does not exist.({gameProviderConfig.GameProviderConfigId})");
 
-                var tokenApiUrl = new Uri(configurationDataJson["TokenApiUrl"]?.ToString()
-                    ?? settingConfigurationJson["TokenApiUrl"]?.ToString()
-                    ?? throw new Exception($"Required parameters(TokenApiUrl)"));
-                var historyBetsApiUrl = new Uri(configurationDataJson["HistoryBetsApiUrl"]?.ToString()
-                    ?? settingConfigurationJson["HistoryBetsApiUrl"]?.ToString()
-                    ?? throw new Exception($"Required parameters(HistoryBetsApiUrl)"));
-                var historyBetsPagingApiUrl = new Uri(configurationDataJson["HistoryBetsPagingApiUrl"]?.ToString()
-                    ?? settingConfigurationJson["HistoryBetsPagingApiUrl"]?.ToString()
-                    ?? throw new Exception($"Required parameters(HistoryBetsPagingApiUrl)"));
+                var dataApiUrl = new Uri(configurationDataJson["DataApiUrl"]?.ToString()
+                    ?? settingConfigurationJson["DataApiUrl"]?.ToString()
+                    ?? throw new Exception($"Required parameters(DataApiUrl)"));
                 var openBetsApiUrl = new Uri(configurationDataJson["OpenBetsApiUrl"]?.ToString()
                     ?? settingConfigurationJson["OpenBetsApiUrl"]?.ToString()
                     ?? throw new Exception($"Required parameters(OpenBetsApiUrl)"));
@@ -105,15 +99,13 @@ internal class JobInitCommandService : ICommandService<JobInitCommand>
                 var jobExecuteCommand = new JobExecuteCommand(
                     GameProviderCode: _gameRecordInfo.GameProviderCode,
                     Name: gameProviderConfig.Name,
-                    TokenApiUrl: tokenApiUrl,
-                    OpenBetsApiUrl: openBetsApiUrl,
-                    HistoryBetsPagingApiUrl: historyBetsPagingApiUrl,
+                    DataApiUrl: dataApiUrl,
                     AgentUserName: agentUserName,
                     AgentPassword: agentPassword);
 
                 gameProviderAgentMapper.Add(agentUserName, jobExecuteCommand);
 
-                var recurringJobId = $"{gameProviderConfig.Name}|{gameProviderConfig.GameProviderConfigId}";
+                var recurringJobId = $"{gameProviderConfig.Name}|{agentUserName}|{gameProviderConfig.GameProviderConfigId}";
 
                 RecurringJob.AddOrUpdate<IHangfireUtensil>(
                     recurringJobId: recurringJobId,

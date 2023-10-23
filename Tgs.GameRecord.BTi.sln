@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.BTi.Core", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tgs.GameRecord.BTi.Core.UnitTest", "Tgs.GameRecord.BTi.Core.UnitTest\Tgs.GameRecord.BTi.Core.UnitTest.csproj", "{651DA571-550A-42AC-808A-25DB83AC69D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tgs.GameRecord.BTi.Common", "Tgs.GameRecord.BTi.Common\Tgs.GameRecord.BTi.Common.csproj", "{B0B155EE-A17C-4613-856A-9DEECFEF8725}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{651DA571-550A-42AC-808A-25DB83AC69D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{651DA571-550A-42AC-808A-25DB83AC69D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{651DA571-550A-42AC-808A-25DB83AC69D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B155EE-A17C-4613-856A-9DEECFEF8725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B155EE-A17C-4613-856A-9DEECFEF8725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B155EE-A17C-4613-856A-9DEECFEF8725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B155EE-A17C-4613-856A-9DEECFEF8725}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

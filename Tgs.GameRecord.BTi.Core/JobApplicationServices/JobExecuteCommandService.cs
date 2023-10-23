@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Tgs.GameRecord.BTi.Common;
 using Tgs.GameRounds.Schedule.Client;
 using Tgs.GameRounds.Schedule.Protos;
 using Tgs.ServiceUtility;
@@ -34,32 +36,24 @@ internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
         var endTime = DateTimeOffset.ParseExact(DateTimeOffset.UtcNow.ToString(@"yyyy-MM-dd\THH:mm:00K"), @"yyyy-MM-dd\THH:mm:ssK", null, styles: System.Globalization.DateTimeStyles.RoundtripKind);
         var startTime = endTime.AddMinutes(_intervalMinutes * -1);
 
-        var parameters = new
-        {
-            command.TokenApiUrl,
-            command.OpenBetsApiUrl,
-            command.HistoryBetsPagingApiUrl,
-            command.AgentUserName,
-            command.AgentPassword,
-            StartTime = startTime,
-            EndTime = endTime
-        };
+        var parameters = new GameRecordMessage
+        (
+            DataApiUrl: command.DataApiUrl,
+            AgentUserName: command.AgentUserName,
+            AgentPassword: command.AgentPassword,
+            StartTime: startTime,
+            EndTime: endTime
+        );
 
         _logger.LogDebug("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
 
         return _client
-            .BTi_ScheduleFormQueuedAsync(
+            .ScheduleFormQueuedAsync(
             gameProviderCode: command.GameProviderCode,
             name: command.Name,
             subject: "gp.gamerecord.scheduleform.bti.queued",
             source: ScheduleFormSource.Schedule,
-            tokenApiUrl: parameters.TokenApiUrl,
-            openBetsApiUrl: parameters.OpenBetsApiUrl,
-            historyBetsPagingApiUrl: parameters.HistoryBetsPagingApiUrl,
-            agentUserName: parameters.AgentUserName,
-            agentPassword: parameters.AgentPassword,
-            startTime: parameters.StartTime,
-            endTime: parameters.EndTime,
+            parameters: JsonSerializer.Serialize(parameters),
             cancellationToken: cancellationToken);
     }
 }

@@ -21,9 +21,7 @@ public class BTiController : ControllerBase
     ///     Post
     ///
     ///         {
-    ///             "tokenApiUrl": "https://asia-east2-bq-data-api.cloudfunctions.net/",
-    ///             "openBetsApiUrl": "https://get-open-bets-d5nlg5buca-de.a.run.app/",
-    ///             "historyBetsPagingApiUrl": "https://get-history-bets-paging-d5nlg5buca-de.a.run.app/",
+    ///             "dataApiUrl": "https://data-api.442hattrick.com/",
     ///             "agentUserName": "PegaGaming_GPIRMB",
     ///             "agentPassword": "IM60Ho7Y4B9C",
     ///             "startTime": "2023-05-29T00:00:00+08:00",
@@ -37,9 +35,7 @@ public class BTiController : ControllerBase
         => service
         .ExecuteAsync(
             command: new PullRecordCommand(
-                TokenApiUrl: source.TokenApiUrl,
-                OpenBetsApiUrl: source.OpenBetsApiUrl,
-                HistoryBetsPagingApiUrl: source.HistoryBetsPagingApiUrl,
+                DataApiUrl: source.DataApiUrl,
                 AgentUserName: source.AgentUserName,
                 AgentPassword: source.AgentPassword,
                 StartTime: source.StartTime,

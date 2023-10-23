@@ -3,8 +3,6 @@
 public record JobExecuteCommand(
     string GameProviderCode,
     string Name,
-    Uri TokenApiUrl,
-    Uri OpenBetsApiUrl,
-    Uri HistoryBetsPagingApiUrl,
+    Uri DataApiUrl,
     string AgentUserName,
     string AgentPassword);

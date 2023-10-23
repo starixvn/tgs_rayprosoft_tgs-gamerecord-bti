@@ -2,13 +2,12 @@
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using Tgs.GameRecord.BTi.Common;
 using Tgs.GameRecord.BTi.Core.ApplicationServices;
 using Tgs.GameRounds.Schedule.Client;
-using Tgs.GameRounds.Schedule.Common.Protos;
 using Tgs.GameRounds.Schedule.Protos;
 using Tgs.ServiceUtility;
 
@@ -27,16 +26,14 @@ public class ScheduleFormDispatcherUnitTest
         var gameProviderCode = "BTI";
         var id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        var parameter = new BTiParameter
-        {
-            TokenApiUrl = "https://asia-east2-bq-data-api.cloudfunctions.net/",
-            OpenBetsApiUrl = "https://get-open-bets-d5nlg5buca-de.a.run.app/",
-            HistoryBetsPagingApiUrl = "https://get-history-bets-paging-d5nlg5buca-de.a.run.app/",
-            AgentUserName = "PegaGaming_GPIRMB",
-            AgentPassword = "IM60Ho7Y4B9C",
-            StartTime = DateTimeOffset.Parse("2023-05-29T00:00:00+08:00").ToTimestamp(),
-            EndTime = DateTimeOffset.Parse("2023-05-30T00:00:00+08:00").ToTimestamp()
-        };
+        var parameters = new GameRecordMessage
+        (
+            DataApiUrl: new Uri("https://data-api.442hattrick.com/"),
+            AgentUserName: "PegaGaming_GPIRMB",
+            AgentPassword: "IM60Ho7Y4B9C",
+            StartTime: DateTimeOffset.Parse("2023-05-29T00:00:00+08:00"),
+            EndTime: DateTimeOffset.Parse("2023-05-30T00:00:00+08:00")
+        );
         var scheduleFormReply = new ScheduleFormReply
         {
             Id = id,
@@ -45,7 +42,7 @@ public class ScheduleFormDispatcherUnitTest
             Name = "test",
             Subject = "gp.gamerecord.scheduleform.bti.queued",
             Source = ScheduleFormSource.Schedule,
-            Parameters = JsonSerializer.Serialize(parameter),
+            Parameters = JsonSerializer.Serialize(parameters),
             State = ScheduleFormState.Queued,
             Status = $"{ScheduleFormState.Queued}..."
         };
@@ -62,13 +59,11 @@ public class ScheduleFormDispatcherUnitTest
             .Returns(true);
 
         var scheduleCommand = new PullRecordCommand(
-            TokenApiUrl: new(parameter.TokenApiUrl),
-            OpenBetsApiUrl: new(parameter.OpenBetsApiUrl),
-            HistoryBetsPagingApiUrl: new(parameter.HistoryBetsPagingApiUrl),
+            DataApiUrl: parameters.DataApiUrl,
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
-            StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset());
+            StartTime: parameters.StartTime,
+            EndTime: parameters.EndTime);
 
         _ = fakePullRecord
            .ExecuteAsync(
@@ -126,16 +121,14 @@ public class ScheduleFormDispatcherUnitTest
         var gameProviderCode = "BTI";
         var id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        var parameter = new BTiParameter
-        {
-            TokenApiUrl = "https://asia-east2-bq-data-api.cloudfunctions.net/",
-            OpenBetsApiUrl = "https://get-open-bets-d5nlg5buca-de.a.run.app/",
-            HistoryBetsPagingApiUrl = "https://get-history-bets-paging-d5nlg5buca-de.a.run.app/",
-            AgentUserName = "PegaGaming_GPIRMB",
-            AgentPassword = "IM60Ho7Y4B9C",
-            StartTime = DateTimeOffset.Parse("2023-05-29T00:00:00+08:00").ToTimestamp(),
-            EndTime = DateTimeOffset.Parse("2023-05-30T00:00:00+08:00").ToTimestamp()
-        };
+        var parameters = new GameRecordMessage
+        (
+            DataApiUrl: new Uri("https://data-api.442hattrick.com/"),
+            AgentUserName: "PegaGaming_GPIRMB",
+            AgentPassword: "IM60Ho7Y4B9C",
+            StartTime: DateTimeOffset.Parse("2023-05-29T00:00:00+08:00"),
+            EndTime: DateTimeOffset.Parse("2023-05-30T00:00:00+08:00")
+        );
         var scheduleFormReply = new ScheduleFormReply
         {
             Id = id,
@@ -144,7 +137,7 @@ public class ScheduleFormDispatcherUnitTest
             Name = "test",
             Subject = "gp.gamerecord.scheduleform.bti.queued",
             Source = ScheduleFormSource.Schedule,
-            Parameters = JsonSerializer.Serialize(parameter),
+            Parameters = JsonSerializer.Serialize(parameters),
             State = ScheduleFormState.Queued,
             Status = $"{ScheduleFormState.Queued}..."
         };
@@ -172,13 +165,11 @@ public class ScheduleFormDispatcherUnitTest
             id: id);
 
         var scheduleCommand = new PullRecordCommand(
-            TokenApiUrl: new(parameter.TokenApiUrl),
-            OpenBetsApiUrl: new(parameter.OpenBetsApiUrl),
-            HistoryBetsPagingApiUrl: new(parameter.HistoryBetsPagingApiUrl),
+            DataApiUrl: parameters.DataApiUrl,
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
-            StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset());
+            StartTime: parameters.StartTime,
+            EndTime: parameters.EndTime);
 
         await fakePullRecord
             .Received(1)
@@ -217,16 +208,14 @@ public class ScheduleFormDispatcherUnitTest
         var gameProviderCode = "BTI";
         var id = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        var parameter = new BTiParameter
-        {
-            TokenApiUrl = "https://asia-east2-bq-data-api.cloudfunctions.net/",
-            OpenBetsApiUrl = "https://get-open-bets-d5nlg5buca-de.a.run.app/",
-            HistoryBetsPagingApiUrl = "https://get-history-bets-paging-d5nlg5buca-de.a.run.app/",
-            AgentUserName = "PegaGaming_GPIRMB",
-            AgentPassword = "IM60Ho7Y4B9C",
-            StartTime = DateTimeOffset.Parse("2023-05-29T00:00:00+08:00").ToTimestamp(),
-            EndTime = DateTimeOffset.Parse("2023-05-30T00:00:00+08:00").ToTimestamp()
-        };
+        var parameters = new GameRecordMessage
+        (
+            DataApiUrl: new Uri("https://data-api.442hattrick.com/"),
+            AgentUserName: "PegaGaming_GPIRMB",
+            AgentPassword: "IM60Ho7Y4B9C",
+            StartTime: DateTimeOffset.Parse("2023-05-29T00:00:00+08:00"),
+            EndTime: DateTimeOffset.Parse("2023-05-30T00:00:00+08:00")
+        );
         var scheduleFormReply = new ScheduleFormReply
         {
             Id = id,
@@ -235,7 +224,7 @@ public class ScheduleFormDispatcherUnitTest
             Name = "test",
             Subject = "gp.gamerecord.scheduleform.bti.queued",
             Source = ScheduleFormSource.Schedule,
-            Parameters = JsonSerializer.Serialize(parameter),
+            Parameters = JsonSerializer.Serialize(parameters),
             State = ScheduleFormState.Processing,
             Status = $"{ScheduleFormState.Processing}..."
         };
@@ -263,13 +252,11 @@ public class ScheduleFormDispatcherUnitTest
             id: Arg.Is(id));
 
         var scheduleCommand = new PullRecordCommand(
-            TokenApiUrl: new(parameter.TokenApiUrl),
-            OpenBetsApiUrl: new(parameter.OpenBetsApiUrl),
-            HistoryBetsPagingApiUrl: new(parameter.HistoryBetsPagingApiUrl),
+            DataApiUrl: parameters.DataApiUrl,
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
-            StartTime: parameter.StartTime.ToDateTimeOffset(),
-            EndTime: parameter.EndTime.ToDateTimeOffset());
+            StartTime: parameters.StartTime,
+            EndTime: parameters.EndTime);
 
         await fakePullRecord
             .Received(0)

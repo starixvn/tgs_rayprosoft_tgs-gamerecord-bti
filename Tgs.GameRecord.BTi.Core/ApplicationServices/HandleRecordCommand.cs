@@ -1,6 +1,5 @@
-﻿using Tgs.GameRecord.BTi.Core.Models;
+﻿using Tgs.GameInterface.BTiService.Protos;
 
 namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
 
-public record HandleRecordCommand(
-    RecordInfo GameRecord);
+public record HandleRecordCommand(GameWagerInfo Info);

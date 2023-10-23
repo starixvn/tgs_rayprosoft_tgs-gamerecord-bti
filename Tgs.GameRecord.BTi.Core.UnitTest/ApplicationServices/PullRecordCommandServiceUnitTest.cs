@@ -17,9 +17,7 @@ public class PullRecordCommandServiceUnitTest
         var fakeSettledService = Substitute.For<ICommandService<PullRecordSettledCommand>>();
 
         var command = new PullRecordCommand(
-            TokenApiUrl: new("https://asia-east2-bq-data-api.cloudfunctions.net/"),
-            OpenBetsApiUrl: new("https://get-open-bets-d5nlg5buca-de.a.run.app/"),
-            HistoryBetsPagingApiUrl: new("https://get-history-bets-paging-d5nlg5buca-de.a.run.app/"),
+            DataApiUrl: new("https://data-api.442hattrick.com/"),
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
             StartTime: DateTimeOffset.Parse("2023-05-29T00:00:00+08:00"),

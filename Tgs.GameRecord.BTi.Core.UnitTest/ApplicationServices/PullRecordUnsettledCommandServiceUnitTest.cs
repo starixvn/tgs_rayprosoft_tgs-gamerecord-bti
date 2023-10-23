@@ -16,12 +16,10 @@ public class PullRecordUnsettledCommandServiceUnitTest
     {
         var fakeLogger = NullLogger<PullRecordUnsettledCommandService>.Instance;
         var fakeClient = Substitute.For<IGameInterfaceBTiClient>();
-        var fakeGameRecordUtensil = Substitute.For<IGameRecordUtensil>();
         var fakeService = Substitute.For<ICommandService<HandleRecordCommand>>();
 
         var command = new PullRecordUnsettledCommand(
-            TokenApiUrl: new("https://asia-east2-bq-data-api.cloudfunctions.net/"),
-            OpenBetsApiUrl: new("https://get-open-bets-d5nlg5buca-de.a.run.app/"),
+            DataApiUrl: new("https://data-api.442hattrick.com/"),
             AgentUserName: "PegaGaming_GPIRMB",
             AgentPassword: "IM60Ho7Y4B9C",
             StartTime: DateTimeOffset.Parse("2023-05-29T00:00:00+08:00"),
@@ -30,20 +28,18 @@ public class PullRecordUnsettledCommandServiceUnitTest
         var service = new PullRecordUnsettledCommandService(
             fakeLogger,
             fakeClient,
-            fakeGameRecordUtensil,
             fakeService);
 
         await service.ExecuteAsync(command);
 
         _ = await fakeClient
             .Received(1)
-            .GameHistoryUnsettledAsync(
-            tokenApiUrl: Arg.Is(command.TokenApiUrl),
-            openBetsApiUrl: Arg.Is(command.OpenBetsApiUrl),
+            .GameWagerUnsettledAsync(
+            dataApiUrl: Arg.Is(command.DataApiUrl),
             agentUserName: Arg.Is(command.AgentUserName),
             agentPassword: Arg.Is(command.AgentPassword),
-            startTime: Arg.Is(command.StartTime.UtcDateTime),
-            endTime: Arg.Is(command.EndTime.UtcDateTime),
+            startTime: Arg.Is(command.StartTime),
+            endTime: Arg.Is(command.EndTime),
             cancellationToken: Arg.Any<CancellationToken>())
             .ToArrayAsync(cancellationToken: Arg.Any<CancellationToken>());
     }

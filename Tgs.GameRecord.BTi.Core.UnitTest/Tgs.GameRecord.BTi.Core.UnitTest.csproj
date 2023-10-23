@@ -23,6 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Tgs.GameRecord.BTi.Common\Tgs.GameRecord.BTi.Common.csproj" />
 	  <ProjectReference Include="..\Tgs.GameRecord.BTi.Core\Tgs.GameRecord.BTi.Core.csproj" />
 	</ItemGroup>
 

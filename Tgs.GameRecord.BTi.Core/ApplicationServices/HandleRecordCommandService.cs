@@ -1,4 +1,5 @@
-﻿using Tgs.GameInterface.BTiService.Protos;
+﻿using Microsoft.Extensions.Options;
+using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.Handle.Client;
 using Tgs.GameRecord.Handle.Common.Protos;
 using Tgs.ServiceUtility;
@@ -8,10 +9,13 @@ namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
 internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
 {
     private readonly IGameRecordHandleClient _client;
+    private readonly GameRecordInfoOptions _gameRecordInfo;
 
     public HandleRecordCommandService(
+        IOptions<GameRecordInfoOptions> options,
         IGameRecordHandleClient client)
     {
+        _gameRecordInfo = options.Value;
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
@@ -19,10 +23,20 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
     {
         var wagerState = WagerStates.Running;
         var cashoutState = CashoutStates.None;
-        if (command.GameRecord.Status != GameHistoryStatus.Opened)
+        var externalClosedOn = DateTimeOffset.UnixEpoch;
+        var bet = command.Info.Bet.ToDecimal().GetValueOrDefault(0);
+        var validBet = command.Info.ValidBet.ToDecimal().GetValueOrDefault(0);
+        var settle = 0.0m;
+        var turnover = 0.0m;
+        var winLoss = 0.0m;
+
+        if (command.Info.IsClosed)
         {
-            wagerState =
-            command.GameRecord.Status switch
+            externalClosedOn = command.Info.ExternalClosedOn.ToDateTimeOffset();
+            settle = command.Info.Settle.ToDecimal().GetValueOrDefault(0);
+            turnover = command.Info.ValidBet.ToDecimal().GetValueOrDefault(0);
+            winLoss = command.Info.WinLoss.ToDecimal().GetValueOrDefault(0);
+            wagerState = command.Info.Status switch
             {
                 GameHistoryStatus.Draw => WagerStates.Draw,
                 GameHistoryStatus.Declined => WagerStates.Reject,
@@ -32,35 +46,35 @@ internal class HandleRecordCommandService : ICommandService<HandleRecordCommand>
                 GameHistoryStatus.HalfLost => WagerStates.HalfLose,
                 GameHistoryStatus.Cashout => WagerStates.Refund,
                 GameHistoryStatus.Lost => WagerStates.Lose,
-                _ => (command.GameRecord.WinLoss > 0) ? WagerStates.Win : WagerStates.Lose
+                _ => (winLoss > 0) ? WagerStates.Win : WagerStates.Lose
             };
-            cashoutState = (command.GameRecord.Status == GameHistoryStatus.Cashout) ? CashoutStates.Cashout : CashoutStates.None;
+            cashoutState = (command.Info.Status == GameHistoryStatus.Cashout) ? CashoutStates.Cashout : CashoutStates.None;
         }
 
         return _client
             .MessageAsync(
-            gameProviderCode: command.GameRecord.GameProviderCode,
-            playerCode: command.GameRecord.PlayerCode,
+            gameProviderCode: _gameRecordInfo.GameProviderCode,
+            playerCode: command.Info.PlayerCode,
             wagerState: wagerState,
             wagerType: WagerTypes.Normal,
             freeGameState: FreeGameStates.None,
             gambleState: GambleStates.None,
             cashoutState: cashoutState,
             resettleState: ResettleStates.None,
-            externalRoundId: command.GameRecord.ExternalRoundId,
-            externalWagerId: command.GameRecord.ExternalRoundId,
-            externalGameId: command.GameRecord.ExternalGameId,
-            externalCreatedOn: command.GameRecord.ExternalCreatedOn,
-            externalClosedOn: command.GameRecord.ExternalClosedOn,
-            externalPayoffOn: command.GameRecord.ExternalClosedOn,
+            externalRoundId: command.Info.ExternalWagerId,
+            externalWagerId: command.Info.ExternalWagerId,
+            externalGameId: _gameRecordInfo.GameExternalId,
+            externalCreatedOn: command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+            externalClosedOn: externalClosedOn,
+            externalPayoffOn: externalClosedOn,
             externalResettleOn: DateTimeOffset.UnixEpoch,
-            bet: command.GameRecord.Bet,
-            validBet: command.GameRecord.ValidBet,
-            settle: command.GameRecord.Settle,
-            commission: command.GameRecord.Commission,
-            turnover: command.GameRecord.Turnover,
-            winLoss: command.GameRecord.WinLoss,
-            additionalData: command.GameRecord.AdditionalData,
+            bet: bet,
+            validBet: validBet,
+            settle: settle,
+            commission: 0.00m,
+            turnover: turnover,
+            winLoss: winLoss,
+            additionalData: command.Info.AdditionalData,
             cancellationToken: cancellationToken);
     }
 }

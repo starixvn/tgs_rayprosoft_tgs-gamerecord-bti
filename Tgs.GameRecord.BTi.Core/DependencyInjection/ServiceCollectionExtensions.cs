@@ -32,7 +32,5 @@ public static class ServiceCollectionExtensions
         .AddGameRecordHandleClient()
         .AddTransient<IHangfireUtensil, HangfireUtensil>()
         .AddSingleton<IScheduleFormDispatcher, ScheduleFormDispatcher>()
-        .AddSingleton<IScheduleFormLock>(sp => ActivatorUtilities.CreateInstance<ScheduleFormLock>(sp, sp.GetRequiredService<RedisConnectionManager>().Database))
-        .AddTransient<IUtensil, UtensilRepository>()
-        .AddSingleton<IGameRecordUtensil, GameRecordUtensil>();
+        .AddSingleton<IScheduleFormLock>(sp => ActivatorUtilities.CreateInstance<ScheduleFormLock>(sp, sp.GetRequiredService<RedisConnectionManager>().Database));
 }

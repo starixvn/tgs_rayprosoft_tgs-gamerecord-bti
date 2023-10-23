@@ -24,8 +24,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
         try
         {
             var unsettledCommand = new PullRecordUnsettledCommand(
-                TokenApiUrl: command.TokenApiUrl,
-                OpenBetsApiUrl: command.OpenBetsApiUrl,
+                DataApiUrl: command.DataApiUrl,
                 AgentUserName: command.AgentUserName,
                 AgentPassword: command.AgentPassword,
                 StartTime: command.StartTime,
@@ -45,8 +44,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
         try
         {
             var settledCommand = new PullRecordSettledCommand(
-                TokenApiUrl: command.TokenApiUrl,
-                HistoryBetsPagingApiUrl: command.HistoryBetsPagingApiUrl,
+                DataApiUrl: command.DataApiUrl,
                 AgentUserName: command.AgentUserName,
                 AgentPassword: command.AgentPassword,
                 StartTime: command.StartTime,
