@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Text.Json.Nodes;
+using Microsoft.Extensions.Options;
 using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.Handle.Client;
 using Tgs.GameRecord.Handle.Common.Protos;
@@ -67,7 +68,7 @@ internal class HandleRecordCommandService(
             commission: 0.00m,
             turnover: turnover,
             winLoss: winLoss,
-            additionalData: command.Info.AdditionalData,
+            additionalData: JsonNode.Parse(command.Info.AdditionalData)!,
             cancellationToken: cancellationToken);
     }
 }
