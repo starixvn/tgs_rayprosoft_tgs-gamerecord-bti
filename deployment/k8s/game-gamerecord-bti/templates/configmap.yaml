@@ -8,13 +8,13 @@ data:
     {
       "Logging": {
         "LogLevel": {
-          "Default": "Warning"
+          "Default": "Warning",
+          "Tgs.GameRecord.BTi.Messages": "Information"
         }
       },
       "GameRecord": {
         "GameCommandClientBaseUrl": "http://game-gamecommand/",
-        "GameRoundsScheduleClientBaseUrl": "http://game-gamerounds-schedule:9090/",
-        "GameInterfaceClientBaseUrl": "http://game-gameinterface-bti-service:9090/"
+        "GameInterfaceClientBaseUrl": "dns:///game-gameinterface-bti-service:9090/"
       }
     }
   otel-collector-config.yaml: |

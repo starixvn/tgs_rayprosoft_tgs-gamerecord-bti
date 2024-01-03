@@ -5,25 +5,14 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
 
-internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUnsettledCommand>
+internal class PullRecordUnsettledCommandService(
+    ILogger<PullRecordUnsettledCommandService> logger,
+    IGameInterfaceBTiClient client,
+    ICommandService<HandleRecordCommand> service) : ICommandService<PullRecordUnsettledCommand>
 {
-    private readonly IGameInterfaceBTiClient _client;
-    private readonly ILogger<PullRecordUnsettledCommandService> _logger;
-    private readonly ICommandService<HandleRecordCommand> _service;
-
-    public PullRecordUnsettledCommandService(
-        ILogger<PullRecordUnsettledCommandService> logger,
-        IGameInterfaceBTiClient client,
-        ICommandService<HandleRecordCommand> service)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _client = client ?? throw new ArgumentNullException(nameof(client));
-        _service = service ?? throw new ArgumentNullException(nameof(service));
-    }
-
     public async ValueTask ExecuteAsync(PullRecordUnsettledCommand command, CancellationToken cancellationToken = default)
     {
-        var infos = await _client
+        var infos = await client
             .GameWagerUnsettledAsync(
             dataApiUrl: command.DataApiUrl,
             agentUserName: command.AgentUserName,
@@ -35,7 +24,7 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
             .ConfigureAwait(false)
             ?? Enumerable.Empty<GameWagerInfo>();
 
-        _logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. Infos:{infos}", DateTime.Now.ToString("o"), infos);
+        logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. Infos:{infos}", DateTime.Now.ToString("o"), infos);
 
         if (!infos.Any())
         {
@@ -44,10 +33,10 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
 
         foreach (var info in infos)
         {
-            _logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. GameWager:{info}", DateTime.Now.ToString("o"), info);
+            logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. GameWager:{info}", DateTime.Now.ToString("o"), info);
             try
             {
-                await _service
+                await service
                     .ExecuteAsync(
                     command: new(Info: info),
                     cancellationToken: cancellationToken)
@@ -55,7 +44,7 @@ internal class PullRecordUnsettledCommandService : ICommandService<PullRecordUns
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
+                logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
             }
         }
     }

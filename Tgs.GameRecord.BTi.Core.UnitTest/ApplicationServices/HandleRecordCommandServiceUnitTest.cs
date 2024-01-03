@@ -20,7 +20,8 @@ public class HandleRecordCommandServiceUnitTest
             GameProviderCode = "BTI",
             GameExternalId = "sports_book",
             GameProviderConfiguration = "BTIConfiguration",
-            GameProviderHangfire = "bti-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-bti-hangfire:",
+            HangfireLocking = "gamerecord-bti-locking:",
             IntervalMinutes = 15,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 5
@@ -85,7 +86,8 @@ public class HandleRecordCommandServiceUnitTest
             GameProviderCode = "BTI",
             GameExternalId = "sports_book",
             GameProviderConfiguration = "BTIConfiguration",
-            GameProviderHangfire = "bti-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-bti-hangfire:",
+            HangfireLocking = "gamerecord-bti-locking:",
             IntervalMinutes = 15,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 5
@@ -150,7 +152,8 @@ public class HandleRecordCommandServiceUnitTest
             GameProviderCode = "BTI",
             GameExternalId = "sports_book",
             GameProviderConfiguration = "BTIConfiguration",
-            GameProviderHangfire = "bti-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-bti-hangfire:",
+            HangfireLocking = "gamerecord-bti-locking:",
             IntervalMinutes = 15,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 5
@@ -215,7 +218,8 @@ public class HandleRecordCommandServiceUnitTest
             GameProviderCode = "BTI",
             GameExternalId = "sports_book",
             GameProviderConfiguration = "BTIConfiguration",
-            GameProviderHangfire = "bti-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-bti-hangfire:",
+            HangfireLocking = "gamerecord-bti-locking:",
             IntervalMinutes = 15,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 5
@@ -280,7 +284,8 @@ public class HandleRecordCommandServiceUnitTest
             GameProviderCode = "BTI",
             GameExternalId = "sports_book",
             GameProviderConfiguration = "BTIConfiguration",
-            GameProviderHangfire = "bti-schedule:hangfire:",
+            HangfirePrefix = "gamerecord-bti-hangfire:",
+            HangfireLocking = "gamerecord-bti-locking:",
             IntervalMinutes = 15,
             IntervalMinutesMax = 30,
             IntervalMinutesMinimum = 5

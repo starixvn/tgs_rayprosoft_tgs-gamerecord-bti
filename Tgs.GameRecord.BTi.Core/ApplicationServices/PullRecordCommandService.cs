@@ -3,22 +3,11 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
 
-internal class PullRecordCommandService : ICommandService<PullRecordCommand>
+internal class PullRecordCommandService(
+    ILogger<PullRecordCommandService> logger,
+    ICommandService<PullRecordUnsettledCommand> unsettledService,
+    ICommandService<PullRecordSettledCommand> settledService) : ICommandService<PullRecordCommand>
 {
-    private readonly ILogger<PullRecordCommandService> _logger;
-    private readonly ICommandService<PullRecordSettledCommand> _settledService;
-    private readonly ICommandService<PullRecordUnsettledCommand> _unsettledService;
-
-    public PullRecordCommandService(
-        ILogger<PullRecordCommandService> logger,
-        ICommandService<PullRecordUnsettledCommand> unsettledService,
-        ICommandService<PullRecordSettledCommand> settledService)
-    {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _unsettledService = unsettledService ?? throw new ArgumentNullException(nameof(unsettledService));
-        _settledService = settledService ?? throw new ArgumentNullException(nameof(settledService));
-    }
-
     public async ValueTask ExecuteAsync(PullRecordCommand command, CancellationToken cancellationToken = default)
     {
         try
@@ -30,7 +19,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
                 StartTime: command.StartTime,
                 EndTime: command.EndTime);
 
-            await _unsettledService
+            await unsettledService
                 .ExecuteAsync(
                 command: unsettledCommand,
                 cancellationToken: cancellationToken)
@@ -38,7 +27,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "LogOn:{logOn} | Action:GameHistoryUnsettledAsync | Message:Bti處理未結算過程中發生例外", DateTime.UtcNow.ToString("O"));
+            logger.LogError(ex, "LogOn:{logOn} | Action:GameHistoryUnsettledAsync | Message:Bti處理未結算過程中發生例外", DateTime.UtcNow.ToString("O"));
         }
 
         try
@@ -50,7 +39,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
                 StartTime: command.StartTime,
                 EndTime: command.EndTime);
 
-            await _settledService
+            await settledService
                 .ExecuteAsync(
                 command: settledCommand,
                 cancellationToken: cancellationToken)
@@ -58,7 +47,7 @@ internal class PullRecordCommandService : ICommandService<PullRecordCommand>
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "LogOn:{logOn} | Action:GameHistorySettledAsync | Message:Bti處理結算過程中發生例外", DateTime.UtcNow.ToString("O"));
+            logger.LogError(ex, "LogOn:{logOn} | Action:GameHistorySettledAsync | Message:Bti處理結算過程中發生例外", DateTime.UtcNow.ToString("O"));
         }
     }
 }
