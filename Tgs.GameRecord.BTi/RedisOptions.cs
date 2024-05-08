@@ -1,7 +1,6 @@
-﻿using Tgs.GameRecord.BTi.Core;
-namespace Tgs.GameRecord.BTi;
+﻿namespace Tgs.GameRecord.BTi;
 
 public record RedisOptions
 {
-    public string ConnectionString { get; set; } = "localhost";
+	public string ConnectionString { get; set; } = "localhost";
 }

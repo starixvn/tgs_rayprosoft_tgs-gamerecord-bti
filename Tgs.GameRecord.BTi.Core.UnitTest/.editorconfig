@@ -6,3 +6,6 @@
 
 # CA2012: 正確使用 ValueTasks
 dotnet_diagnostic.CA2012.severity = silent
+
+# CA1707: 識別項不應包含底線
+dotnet_diagnostic.CA1707.severity = none
