@@ -13,7 +13,7 @@ namespace Tgs.GameRecord.BTi.Core.UnitTest.ApplicationServices;
 public class PullRecordSettledCommandServiceUnitTest
 {
 	[Fact]
-	public async Task  Normal_Process()
+	public async Task Normal_Process()
 	{
 		var fakeLogger = NullLogger<PullRecordSettledCommandService>.Instance;
 		var fakeClient = Substitute.For<IGameInterfaceBTiClient>();
