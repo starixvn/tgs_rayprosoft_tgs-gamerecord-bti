@@ -8,34 +8,24 @@ using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.BTi.Core.JobApplicationServices;
 
-internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
+internal class JobExecuteCommandService(
+	ILogger<JobExecuteCommandService> logger,
+	IOptions<GameRecordInfoOptions> options,
+	TimeProvider timeProvider,
+	IMessageSender messageSender) : ICommandService<JobExecuteCommand>
 {
-	private readonly GameRecordInfoOptions _gameRecordInfo;
-	private readonly double _intervalMinutes;
-	private readonly ILogger<JobExecuteCommandService> _logger;
-	private readonly IMessageSender _messageSender;
-
-	public JobExecuteCommandService(
-		ILogger<JobExecuteCommandService> logger,
-		IOptions<GameRecordInfoOptions> options,
-		IMessageSender messageSender)
-	{
-		_gameRecordInfo = options.Value;
-		_logger = logger ?? throw new ArgumentNullException(nameof(logger));
-		_messageSender = messageSender ?? throw new ArgumentNullException(nameof(messageSender));
-		_intervalMinutes = _gameRecordInfo.IntervalMinutesMax < _gameRecordInfo.IntervalMinutes
-			? _gameRecordInfo.IntervalMinutesMax
-			: _gameRecordInfo.IntervalMinutesMinimum > _gameRecordInfo.IntervalMinutes
-			? _gameRecordInfo.IntervalMinutesMinimum
-			: _gameRecordInfo.IntervalMinutes;
-	}
+	private readonly double _intervalMinutes = Math.Clamp(
+			value: options.Value.IntervalMinutes,
+			min: options.Value.IntervalMinutesMinimum,
+			max: options.Value.IntervalMinutesMax);
 
 	public ValueTask ExecuteAsync(JobExecuteCommand command, CancellationToken cancellationToken = default)
 	{
-		var endTime = DateTimeOffset.Parse(DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:00.000z"));
+		var currentTime = timeProvider.GetUtcNow();
+		var endTime = DateTimeOffset.Parse(currentTime.ToString("yyyy-MM-ddTHH:mm:00.000z"));
 		var startTime = endTime.AddMinutes(_intervalMinutes * -1);
 
-		var parameters = new BTiGameRecordMessage
+		var message = new BTiGameRecordMessage
 		{
 			DataApiUrl = command.DataApiUrl,
 			AgentUserName = command.AgentUserName,
@@ -44,12 +34,26 @@ internal class JobExecuteCommandService : ICommandService<JobExecuteCommand>
 			EndTime = endTime
 		};
 
-		_logger.LogDebug("LogOn:{logOn} Parameters:{parameters}", DateTime.Now.ToString("u"), parameters);
+		logger.LogInformation("{logInformation}",
+			JsonSerializer.Serialize(new
+			{
+				LogOn = DateTime.Now.ToString("u"),
+				Subject = BTiNatsConst.SchedulePublish,
+				Data = new
+				{
+					message.DataApiUrl,
+					message.AgentUserName,
+					message.AgentPassword,
+					StartTime = message.StartTime.ToString("u"),
+					EndTime = message.EndTime.ToString("u")
+				},
+				Message = "This message publishing handler."
+			}));
 
-		return _messageSender
+		return messageSender
 			.PublishAsync(
 			subject: BTiNatsConst.SchedulePublish,
-			data: Encoding.UTF8.GetBytes(JsonSerializer.Serialize(parameters)),
+			data: JsonSerializer.SerializeToUtf8Bytes(message),
 			cancellationToken: cancellationToken);
 	}
 }

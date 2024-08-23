@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using NSubstitute;
 using Tgs.GameInterface.BTiService.Protos;
 using Tgs.GameRecord.BTi.Core.ApplicationServices;
+using Tgs.GameRecord.Handle.Client;
 using Valhalla.MessageQueue;
 
 namespace Tgs.GameRecord.BTi.Core.UnitTest.ApplicationServices;
@@ -17,7 +18,7 @@ public class HandleRecordCommandServiceUnitTest
 	public async Task Settlement_Canceled()
 	{
 		var faceLogger = NullLogger<HandleRecordCommandService>.Instance;
-		var gameRecordInfo = Options.Create(new GameRecordInfoOptions
+		var fakeGameRecordInfoOptions = Options.Create(new GameRecordInfoOptions
 		{
 			GameProviderCode = "BTI",
 			GameExternalId = "sports_book",
@@ -28,7 +29,12 @@ public class HandleRecordCommandServiceUnitTest
 			IntervalMinutesMax = 30,
 			IntervalMinutesMinimum = 5
 		});
-		var fakeMessageSender = Substitute.For<IMessageSender>();
+		var fakePolicySettingsOptions = Options.Create(new PolicySettingsOptions
+		{
+			RetryCount = 1,
+			RetrySeconds = 1,
+		});
+		var fakeGameRecordHandleClient = Substitute.For<IGameRecordHandleClient>();
 
 		var command = new HandleRecordCommand(
 			Info: new GameWagerInfo
@@ -46,28 +52,28 @@ public class HandleRecordCommandServiceUnitTest
 				AdditionalData = "{\"BetSettledDate\":\"2023-09-19T12:36:22.327\",\"BetStatus\":\"Canceled\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPISO\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-09-18T01:15:08.8\",\"Currency\":\"PHP\",\"CustomerID\":124440379,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"MerchantCustomerID\":\"4ukukz9lsn0e\",\"NonCashOutAmount\":0.0,\"Odds\":-156,\"OddsDec\":1.64,\"OddsInUserStyle\":\"1.64\",\"OddsStyleOfUser\":\"European\",\"PL\":0.0,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"491416857069453312\",\"RealMoneyAmount\":50.0,\"Return\":50.0,\"SearchDateTime\":\"2023-09-19T12:44:25.214\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Lin Zhu\",\"BetID\":\"491416857069453313\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":6,\"BranchName\":\"Tennis\",\"CouponCode\":\"\",\"EncodedLineID\":\"0ML491219173364744204A\",\"EventDate\":\"2023-09-18T02:00:00\",\"EventTypeID\":0,\"EventTypeName\":\"FT Winner\",\"GameID\":491219172865658880,\"HomeTeam\":\"Anna Kalinskaya\",\"IsLive\":0,\"IsNewLine\":0,\"LeagueID\":490605751149318144,\"LeagueName\":\"WTA Guangzhou\",\"LineID\":0,\"LineTypeID\":1,\"LineTypeName\":\"Winner\",\"LiveScore1\":0,\"LiveScore2\":0,\"Odds\":-156,\"OddsDec\":1.64,\"OddsInUserStyle\":\"1.64\",\"Points\":0.0,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"None\",\"Status\":\"Canceled\",\"UpdateDate\":null,\"YourBet\":\"Lin Zhu\",\"Isfreebet\":0,\"Isresettled\":0}],\"Status\":\"Canceled\",\"SystemName\":\"0/1\",\"TotalStake\":50.0,\"UpdateDate\":\"2023-09-19T12:36:22.327\",\"UserName\":\"4ukukz9lsn0e\",\"ValidStake\":0}"
 			});
 
-		var service = new HandleRecordCommandService(
+		var sut = new HandleRecordCommandService(
 			faceLogger,
-			gameRecordInfo,
-			fakeMessageSender);
+			fakeGameRecordInfoOptions,
+			fakePolicySettingsOptions,
+			fakeGameRecordHandleClient);
 
-		await service.ExecuteAsync(command);
+		await sut.ExecuteAsync(command);
 
-		_ = fakeMessageSender
+		_ = fakeGameRecordHandleClient
 			.Received(1)
-			.PublishAsync(
-			subject: Arg.Is(Handle.Common.GameRecordHandleNatsConst.GameRecordHandleRequest),
-			data: Arg.Is(new Handle.Common.Protos.GameRecordHandleRequest
+			.HandleAsync(
+			source: Arg.Is(new Handle.Common.ViewModels.GameRecordHandleViewModel
 			{
-				GameProviderCode = gameRecordInfo.Value.GameProviderCode,
+				GameProviderCode = fakeGameRecordInfoOptions.Value.GameProviderCode,
 				PlayerCode = command.Info.PlayerCode,
 				ExternalRoundId = command.Info.ExternalWagerId,
 				ExternalBetId = command.Info.ExternalWagerId,
-				ExternalGameId = gameRecordInfo.Value.GameExternalId,
-				ExternalCreatedOn = command.Info.ExternalCreatedOn,
-				ExternalClosedOn = command.Info.ExternalClosedOn,
-				ExternalPayoffOn = command.Info.ExternalClosedOn,
-				ExternalResettleOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
+				ExternalGameId = fakeGameRecordInfoOptions.Value.GameExternalId,
+				ExternalCreatedOn = command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalPayoffOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalResettleOn = DateTimeOffset.UnixEpoch,
 				BetState = Handle.Common.Protos.BetState.Cancel,
 				BetType = Handle.Common.Protos.BetType.Normal,
 				FreeGameState = Handle.Common.Protos.FreeGameState.None,
@@ -91,7 +97,7 @@ public class HandleRecordCommandServiceUnitTest
 	public async Task Settlement_Cashout()
 	{
 		var faceLogger = NullLogger<HandleRecordCommandService>.Instance;
-		var gameRecordInfo = Options.Create(new GameRecordInfoOptions
+		var fakeGameRecordInfoOptions = Options.Create(new GameRecordInfoOptions
 		{
 			GameProviderCode = "BTI",
 			GameExternalId = "sports_book",
@@ -102,7 +108,12 @@ public class HandleRecordCommandServiceUnitTest
 			IntervalMinutesMax = 30,
 			IntervalMinutesMinimum = 5
 		});
-		var fakeMessageSender = Substitute.For<IMessageSender>();
+		var fakePolicySettingsOptions = Options.Create(new PolicySettingsOptions
+		{
+			RetryCount = 1,
+			RetrySeconds = 1,
+		});
+		var fakeGameRecordHandleClient = Substitute.For<IGameRecordHandleClient>();
 
 		var command = new HandleRecordCommand(
 			Info: new GameWagerInfo
@@ -120,28 +131,28 @@ public class HandleRecordCommandServiceUnitTest
 				AdditionalData = "{\"BetSettledDate\":\"2023-05-10T04:38:56.602\",\"BetStatus\":\"Won\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPB1\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-05-10T04:12:18.11\",\"Currency\":\"PHP\",\"CustomerID\":112910928,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"MerchantCustomerID\":\"4uiq47lurf6z\",\"NonCashOutAmount\":0,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"OddsStyleOfUser\":\"European\",\"PL\":4.24,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"443988629220675584\",\"RealMoneyAmount\":4.0,\"Return\":8.24,\"SearchDateTime\":\"2023-05-10T04:44:56.009\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Phoenix Suns\",\"BetID\":\"443988629220675585\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":2,\"BranchName\":\"Basketball\",\"CouponCode\":\"\",\"EncodedLineID\":\"0HC443242889859137536AMM\",\"EventDate\":\"2023-05-10T02:00:00\",\"EventTypeID\":39,\"EventTypeName\":\"Live Betting Spread\",\"GameID\":443242887480950784,\"HomeTeam\":\"Denver Nuggets\",\"IsLive\":1,\"IsNewLine\":0,\"LeagueID\":216474657157816320,\"LeagueName\":\"NBA\",\"LineID\":0,\"LineTypeID\":2,\"LineTypeName\":\"Spread\",\"LiveScore1\":104,\"LiveScore2\":80,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"Points\":19.5,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"118 : 102\",\"Status\":\"Won\",\"UpdateDate\":null,\"YourBet\":\"Phoenix Suns \\u002B19.5\",\"Isfreebet\":0,\"Isresettled\":0}],\"Status\":\"Won\",\"SystemName\":\"0/1\",\"TotalStake\":4.0,\"UpdateDate\":\"2023-05-10T04:38:56.602\",\"UserName\":\"4uiq47lurf6z\",\"ValidStake\":4.0}"
 			});
 
-		var service = new HandleRecordCommandService(
+		var sut = new HandleRecordCommandService(
 			faceLogger,
-			gameRecordInfo,
-			fakeMessageSender);
+			fakeGameRecordInfoOptions,
+			fakePolicySettingsOptions,
+			fakeGameRecordHandleClient);
 
-		await service.ExecuteAsync(command);
+		await sut.ExecuteAsync(command);
 
-		_ = fakeMessageSender
+		_ = fakeGameRecordHandleClient
 			.Received(1)
-			.PublishAsync(
-			subject: Arg.Is(Handle.Common.GameRecordHandleNatsConst.GameRecordHandleRequest),
-			data: Arg.Is(new Handle.Common.Protos.GameRecordHandleRequest
+			.HandleAsync(
+			source: Arg.Is(new Handle.Common.ViewModels.GameRecordHandleViewModel
 			{
-				GameProviderCode = gameRecordInfo.Value.GameProviderCode,
+				GameProviderCode = fakeGameRecordInfoOptions.Value.GameProviderCode,
 				PlayerCode = command.Info.PlayerCode,
 				ExternalRoundId = command.Info.ExternalWagerId,
 				ExternalBetId = command.Info.ExternalWagerId,
-				ExternalGameId = gameRecordInfo.Value.GameExternalId,
-				ExternalCreatedOn = command.Info.ExternalCreatedOn,
-				ExternalClosedOn = command.Info.ExternalClosedOn,
-				ExternalPayoffOn = command.Info.ExternalClosedOn,
-				ExternalResettleOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
+				ExternalGameId = fakeGameRecordInfoOptions.Value.GameExternalId,
+				ExternalCreatedOn = command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalPayoffOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalResettleOn = DateTimeOffset.UnixEpoch,
 				BetState = Handle.Common.Protos.BetState.Refund,
 				BetType = Handle.Common.Protos.BetType.Normal,
 				FreeGameState = Handle.Common.Protos.FreeGameState.None,
@@ -165,7 +176,7 @@ public class HandleRecordCommandServiceUnitTest
 	public async Task Settlement_Loss()
 	{
 		var faceLogger = NullLogger<HandleRecordCommandService>.Instance;
-		var gameRecordInfo = Options.Create(new GameRecordInfoOptions
+		var fakeGameRecordInfoOptions = Options.Create(new GameRecordInfoOptions
 		{
 			GameProviderCode = "BTI",
 			GameExternalId = "sports_book",
@@ -176,7 +187,12 @@ public class HandleRecordCommandServiceUnitTest
 			IntervalMinutesMax = 30,
 			IntervalMinutesMinimum = 5
 		});
-		var fakeMessageSender = Substitute.For<IMessageSender>();
+		var fakePolicySettingsOptions = Options.Create(new PolicySettingsOptions
+		{
+			RetryCount = 1,
+			RetrySeconds = 1,
+		});
+		var fakeGameRecordHandleClient = Substitute.For<IGameRecordHandleClient>();
 
 		var command = new HandleRecordCommand(
 			Info: new GameWagerInfo
@@ -194,28 +210,28 @@ public class HandleRecordCommandServiceUnitTest
 				AdditionalData = "{\"BetSettledDate\":\"2023-05-10T06:13:16.871\",\"BetStatus\":\"Lost\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPB1\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-05-10T05:00:48.888\",\"Currency\":\"PHP\",\"CustomerID\":112910928,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"MerchantCustomerID\":\"4uiq47lurf6z\",\"NonCashOutAmount\":0,\"Odds\":-114,\"OddsDec\":1.88,\"OddsInUserStyle\":\"1.88\",\"OddsStyleOfUser\":\"European\",\"PL\":-8.0,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"444000837900083200\",\"RealMoneyAmount\":8.0,\"Return\":0.0,\"SearchDateTime\":\"2023-05-10T06:16:36.887\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Indonesia [W]\",\"BetID\":\"444000837900083201\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":2,\"BranchName\":\"Basketball\",\"CouponCode\":\"\",\"EncodedLineID\":\"0OU443743933215096834OMM\",\"EventDate\":\"2023-05-10T04:00:00\",\"EventTypeID\":39,\"EventTypeName\":\"Live Betting O/U\",\"GameID\":443743932179120128,\"HomeTeam\":\"Thailand [W]\",\"IsLive\":1,\"IsNewLine\":0,\"LeagueID\":443001798798925824,\"LeagueName\":\"SEA Games Women\",\"LineID\":0,\"LineTypeID\":3,\"LineTypeName\":\"O/U\",\"LiveScore1\":30,\"LiveScore2\":44,\"Odds\":-114,\"OddsDec\":1.88,\"OddsInUserStyle\":\"1.88\",\"Points\":141.5,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"69 : 70\",\"Status\":\"Lost\",\"UpdateDate\":null,\"YourBet\":\"Over 141.5\",\"Isfreebet\":0,\"Isresettled\":0}],\"Status\":\"Lost\",\"SystemName\":\"0/1\",\"TotalStake\":8.0,\"UpdateDate\":\"2023-05-10T06:13:16.871\",\"UserName\":\"4uiq47lurf6z\",\"ValidStake\":8.0}"
 			});
 
-		var service = new HandleRecordCommandService(
+		var sut = new HandleRecordCommandService(
 			faceLogger,
-			gameRecordInfo,
-			fakeMessageSender);
+			fakeGameRecordInfoOptions,
+			fakePolicySettingsOptions,
+			fakeGameRecordHandleClient);
 
-		await service.ExecuteAsync(command);
+		await sut.ExecuteAsync(command);
 
-		_ = fakeMessageSender
+		_ = fakeGameRecordHandleClient
 			.Received(1)
-			.PublishAsync(
-			subject: Arg.Is(Handle.Common.GameRecordHandleNatsConst.GameRecordHandleRequest),
-			data: Arg.Is(new Handle.Common.Protos.GameRecordHandleRequest
+			.HandleAsync(
+			source: Arg.Is(new Handle.Common.ViewModels.GameRecordHandleViewModel
 			{
-				GameProviderCode = gameRecordInfo.Value.GameProviderCode,
+				GameProviderCode = fakeGameRecordInfoOptions.Value.GameProviderCode,
 				PlayerCode = command.Info.PlayerCode,
 				ExternalRoundId = command.Info.ExternalWagerId,
 				ExternalBetId = command.Info.ExternalWagerId,
-				ExternalGameId = gameRecordInfo.Value.GameExternalId,
-				ExternalCreatedOn = command.Info.ExternalCreatedOn,
-				ExternalClosedOn = command.Info.ExternalClosedOn,
-				ExternalPayoffOn = command.Info.ExternalClosedOn,
-				ExternalResettleOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
+				ExternalGameId = fakeGameRecordInfoOptions.Value.GameExternalId,
+				ExternalCreatedOn = command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalPayoffOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalResettleOn = DateTimeOffset.UnixEpoch,
 				BetState = Handle.Common.Protos.BetState.Loss,
 				BetType = Handle.Common.Protos.BetType.Normal,
 				FreeGameState = Handle.Common.Protos.FreeGameState.None,
@@ -239,7 +255,7 @@ public class HandleRecordCommandServiceUnitTest
 	public async Task Settlement_Win()
 	{
 		var faceLogger = NullLogger<HandleRecordCommandService>.Instance;
-		var gameRecordInfo = Options.Create(new GameRecordInfoOptions
+		var fakeGameRecordInfoOptions = Options.Create(new GameRecordInfoOptions
 		{
 			GameProviderCode = "BTI",
 			GameExternalId = "sports_book",
@@ -250,7 +266,12 @@ public class HandleRecordCommandServiceUnitTest
 			IntervalMinutesMax = 30,
 			IntervalMinutesMinimum = 5
 		});
-		var fakeMessageSender = Substitute.For<IMessageSender>();
+		var fakePolicySettingsOptions = Options.Create(new PolicySettingsOptions
+		{
+			RetryCount = 1,
+			RetrySeconds = 1,
+		});
+		var fakeGameRecordHandleClient = Substitute.For<IGameRecordHandleClient>();
 
 		var command = new HandleRecordCommand(
 			Info: new GameWagerInfo
@@ -268,28 +289,28 @@ public class HandleRecordCommandServiceUnitTest
 				AdditionalData = "{\"BetSettledDate\":\"2023-05-10T04:38:56.602\",\"BetStatus\":\"Won\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPB1\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-05-10T04:12:18.11\",\"Currency\":\"PHP\",\"CustomerID\":112910928,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"MerchantCustomerID\":\"4uiq47lurf6z\",\"NonCashOutAmount\":0,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"OddsStyleOfUser\":\"European\",\"PL\":4.24,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"443988629220675584\",\"RealMoneyAmount\":4.0,\"Return\":8.24,\"SearchDateTime\":\"2023-05-10T04:44:56.009\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Phoenix Suns\",\"BetID\":\"443988629220675585\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":2,\"BranchName\":\"Basketball\",\"CouponCode\":\"\",\"EncodedLineID\":\"0HC443242889859137536AMM\",\"EventDate\":\"2023-05-10T02:00:00\",\"EventTypeID\":39,\"EventTypeName\":\"Live Betting Spread\",\"GameID\":443242887480950784,\"HomeTeam\":\"Denver Nuggets\",\"IsLive\":1,\"IsNewLine\":0,\"LeagueID\":216474657157816320,\"LeagueName\":\"NBA\",\"LineID\":0,\"LineTypeID\":2,\"LineTypeName\":\"Spread\",\"LiveScore1\":104,\"LiveScore2\":80,\"Odds\":106,\"OddsDec\":2.06,\"OddsInUserStyle\":\"2.06\",\"Points\":19.5,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"118 : 102\",\"Status\":\"Won\",\"UpdateDate\":null,\"YourBet\":\"Phoenix Suns \\u002B19.5\",\"Isfreebet\":0,\"Isresettled\":0}],\"Status\":\"Won\",\"SystemName\":\"0/1\",\"TotalStake\":4.0,\"UpdateDate\":\"2023-05-10T04:38:56.602\",\"UserName\":\"4uiq47lurf6z\",\"ValidStake\":4.0}"
 			});
 
-		var service = new HandleRecordCommandService(
+		var sut = new HandleRecordCommandService(
 			faceLogger,
-			gameRecordInfo,
-			fakeMessageSender);
+			fakeGameRecordInfoOptions,
+			fakePolicySettingsOptions,
+			fakeGameRecordHandleClient);
 
-		await service.ExecuteAsync(command);
+		await sut.ExecuteAsync(command);
 
-		_ = fakeMessageSender
+		_ = fakeGameRecordHandleClient
 			.Received(1)
-			.PublishAsync(
-			subject: Arg.Is(Handle.Common.GameRecordHandleNatsConst.GameRecordHandleRequest),
-			data: Arg.Is(new Handle.Common.Protos.GameRecordHandleRequest
+			.HandleAsync(
+			source: Arg.Is(new Handle.Common.ViewModels.GameRecordHandleViewModel
 			{
-				GameProviderCode = gameRecordInfo.Value.GameProviderCode,
+				GameProviderCode = fakeGameRecordInfoOptions.Value.GameProviderCode,
 				PlayerCode = command.Info.PlayerCode,
 				ExternalRoundId = command.Info.ExternalWagerId,
 				ExternalBetId = command.Info.ExternalWagerId,
-				ExternalGameId = gameRecordInfo.Value.GameExternalId,
-				ExternalCreatedOn = command.Info.ExternalCreatedOn,
-				ExternalClosedOn = command.Info.ExternalClosedOn,
-				ExternalPayoffOn = command.Info.ExternalClosedOn,
-				ExternalResettleOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
+				ExternalGameId = fakeGameRecordInfoOptions.Value.GameExternalId,
+				ExternalCreatedOn = command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalPayoffOn = command.Info.ExternalClosedOn.ToDateTimeOffset(),
+				ExternalResettleOn = DateTimeOffset.UnixEpoch,
 				BetState = Handle.Common.Protos.BetState.Win,
 				BetType = Handle.Common.Protos.BetType.Normal,
 				FreeGameState = Handle.Common.Protos.FreeGameState.None,
@@ -313,7 +334,7 @@ public class HandleRecordCommandServiceUnitTest
 	public async Task Running()
 	{
 		var faceLogger = NullLogger<HandleRecordCommandService>.Instance;
-		var gameRecordInfo = Options.Create(new GameRecordInfoOptions
+		var fakeGameRecordInfoOptions = Options.Create(new GameRecordInfoOptions
 		{
 			GameProviderCode = "BTI",
 			GameExternalId = "sports_book",
@@ -324,7 +345,12 @@ public class HandleRecordCommandServiceUnitTest
 			IntervalMinutesMax = 30,
 			IntervalMinutesMinimum = 5
 		});
-		var fakeMessageSender = Substitute.For<IMessageSender>();
+		var fakePolicySettingsOptions = Options.Create(new PolicySettingsOptions
+		{
+			RetryCount = 1,
+			RetrySeconds = 1,
+		});
+		var fakeGameRecordHandleClient = Substitute.For<IGameRecordHandleClient>();
 
 		var command = new HandleRecordCommand(
 			Info: new GameWagerInfo
@@ -342,28 +368,28 @@ public class HandleRecordCommandServiceUnitTest
 				AdditionalData = "{\"BetSettledDate\":\"2023-05-10T05:03:04.111\",\"BetStatus\":\"Opened\",\"BetTypeId\":1,\"BetTypeName\":\"Single bets\",\"Brand\":\"TGSPB1\",\"ComboBonusAmount\":0.0,\"CreationDate\":\"2023-05-10T05:03:03.988\",\"Currency\":\"PHP\",\"CustomerID\":112910928,\"DomainID\":0,\"FreeBet\":{\"Amount\":0.0,\"IsRiskFreeBet\":0},\"Gain\":\"13.37\",\"MerchantCustomerID\":\"4uiq47lurf6z\",\"NonCashOutAmount\":0,\"Odds\":-110,\"OddsDec\":1.91,\"OddsInUserStyle\":\"1.91\",\"OddsStyleOfUser\":\"European\",\"PL\":0.0,\"Platform\":\"Mobile\",\"PlayerLevelID\":0,\"PlayerLevelName\":\"Newly Registered\",\"PurchaseID\":\"444001404563144704\",\"RealMoneyAmount\":7.0,\"Return\":0.0,\"SearchDateTime\":\"2023-05-10T05:08:28.633\",\"Selections\":[{\"ActionType\":\"Real\",\"AwayTeam\":\"Miami Heat\",\"BetID\":\"444001404563144705\",\"BetType\":\"Single bets\",\"BonusID\":0,\"BranchID\":2,\"BranchName\":\"Basketball\",\"CouponCode\":\"\",\"EncodedLineID\":\"0OU443600785004355584OMM\",\"EventDate\":\"2023-05-10T23:30:00\",\"EventTypeID\":0,\"EventTypeName\":\"FT O/U\",\"GameID\":443600782814953472,\"HomeTeam\":\"New York Knicks\",\"IsLive\":0,\"IsNewLine\":0,\"LeagueID\":216474657157816320,\"LeagueName\":\"NBA\",\"LineID\":0,\"LineTypeID\":3,\"LineTypeName\":\"O/U\",\"LiveScore1\":0,\"LiveScore2\":0,\"Odds\":-110,\"OddsDec\":1.91,\"OddsInUserStyle\":\"1.91\",\"Points\":209.0,\"ReferenceID\":0,\"RelatedBetID\":0,\"Score\":\"None\",\"Status\":\"Opened\",\"UpdateDate\":null,\"YourBet\":\"Over 209\",\"Isfreebet\":0}],\"SystemName\":\"0/1\",\"TotalStake\":7.0,\"UpdateDate\":\"2023-05-10T05:03:04.111\",\"UserName\":\"4uiq47lurf6z\",\"ValidStake\":0}"
 			});
 
-		var service = new HandleRecordCommandService(
+		var sut = new HandleRecordCommandService(
 			faceLogger,
-			gameRecordInfo,
-			fakeMessageSender);
+			fakeGameRecordInfoOptions,
+			fakePolicySettingsOptions,
+			fakeGameRecordHandleClient);
 
-		await service.ExecuteAsync(command);
+		await sut.ExecuteAsync(command);
 
-		_ = fakeMessageSender
+		_ = fakeGameRecordHandleClient
 			.Received(1)
-			.PublishAsync(
-			subject: Arg.Is(Handle.Common.GameRecordHandleNatsConst.GameRecordHandleRequest),
-			data: Arg.Is(new Handle.Common.Protos.GameRecordHandleRequest
+			.HandleAsync(
+			source: Arg.Is(new Handle.Common.ViewModels.GameRecordHandleViewModel
 			{
-				GameProviderCode = gameRecordInfo.Value.GameProviderCode,
+				GameProviderCode = fakeGameRecordInfoOptions.Value.GameProviderCode,
 				PlayerCode = command.Info.PlayerCode,
 				ExternalRoundId = command.Info.ExternalWagerId,
 				ExternalBetId = command.Info.ExternalWagerId,
-				ExternalGameId = gameRecordInfo.Value.GameExternalId,
-				ExternalCreatedOn = command.Info.ExternalCreatedOn,
-				ExternalClosedOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
-				ExternalPayoffOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
-				ExternalResettleOn = DateTimeOffset.UnixEpoch.ToTimestamp(),
+				ExternalGameId = fakeGameRecordInfoOptions.Value.GameExternalId,
+				ExternalCreatedOn = command.Info.ExternalCreatedOn.ToDateTimeOffset(),
+				ExternalClosedOn = DateTimeOffset.UnixEpoch,
+				ExternalPayoffOn = DateTimeOffset.UnixEpoch,
+				ExternalResettleOn = DateTimeOffset.UnixEpoch,
 				BetState = Handle.Common.Protos.BetState.Running,
 				BetType = Handle.Common.Protos.BetType.Normal,
 				FreeGameState = Handle.Common.Protos.FreeGameState.None,
