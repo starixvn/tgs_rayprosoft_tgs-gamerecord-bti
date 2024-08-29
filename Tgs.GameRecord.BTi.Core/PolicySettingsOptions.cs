@@ -1,4 +1,4 @@
-namespace Tgs.GameRecord.BTi.Core;
+﻿namespace Tgs.GameRecord.BTi.Core;
 
 public record PolicySettingsOptions
 {

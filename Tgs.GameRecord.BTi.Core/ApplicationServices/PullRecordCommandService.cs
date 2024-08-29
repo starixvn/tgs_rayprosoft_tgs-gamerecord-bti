@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.ServiceUtility;
 
 namespace Tgs.GameRecord.BTi.Core.ApplicationServices;
@@ -27,7 +28,12 @@ internal class PullRecordCommandService(
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "LogOn:{logOn} | Action:GameHistoryUnsettledAsync | Message:Bti處理未結算過程中發生例外", DateTime.UtcNow.ToString("O"));
+			logger.LogError(ex, "{logError}",
+				JsonSerializer.Serialize(new
+				{
+					LogOn = DateTime.Now.ToString("u"),
+					Message = "An exception occurred during the unsettled processing of this Bti."
+				}));
 		}
 
 		try
@@ -47,7 +53,12 @@ internal class PullRecordCommandService(
 		}
 		catch (Exception ex)
 		{
-			logger.LogError(ex, "LogOn:{logOn} | Action:GameHistorySettledAsync | Message:Bti處理結算過程中發生例外", DateTime.UtcNow.ToString("O"));
+			logger.LogError(ex, "{logError}",
+				JsonSerializer.Serialize(new
+				{
+					LogOn = DateTime.Now.ToString("u"),
+					Message = "An exception occurred during settlement processing for this Bti."
+				}));
 		}
 	}
 }

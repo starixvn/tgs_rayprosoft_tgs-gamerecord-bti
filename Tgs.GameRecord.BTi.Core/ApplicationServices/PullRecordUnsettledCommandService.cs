@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.GameInterface.BTiService.Client;
 using Tgs.GameInterface.BTiService.Protos;
 using Tgs.ServiceUtility;
@@ -24,8 +25,6 @@ internal class PullRecordUnsettledCommandService(
 			.ConfigureAwait(false)
 			?? Enumerable.Empty<GameWagerInfo>();
 
-		logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. Infos:{infos}", DateTime.Now.ToString("o"), infos);
-
 		if (!infos.Any())
 		{
 			return;
@@ -33,7 +32,6 @@ internal class PullRecordUnsettledCommandService(
 
 		foreach (var info in infos)
 		{
-			logger.LogDebug("LogOn:{logOn} Message: Game Wager Unsettled. GameWager:{info}", DateTime.Now.ToString("o"), info);
 			try
 			{
 				await service
@@ -44,7 +42,19 @@ internal class PullRecordUnsettledCommandService(
 			}
 			catch (Exception ex)
 			{
-				logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
+				logger.LogError(ex, "{logError}",
+					JsonSerializer.Serialize(new
+					{
+						LogOn = DateTime.Now.ToString("u"),
+						Data = new
+						{
+							info.PlayerCode,
+							info.ExternalWagerId,
+							ExternalCreatedOn = info.ExternalCreatedOn.ToDateTimeOffset(),
+							ExternalClosedOn = info.ExternalClosedOn.ToDateTimeOffset()
+						},
+						Message = "An exception occurred in this game wager."
+					}));
 			}
 		}
 	}
