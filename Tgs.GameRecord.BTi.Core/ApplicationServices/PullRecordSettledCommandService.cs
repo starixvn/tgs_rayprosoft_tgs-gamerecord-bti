@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Tgs.GameInterface.BTiService.Client;
 using Tgs.GameInterface.BTiService.Protos;
 using Tgs.ServiceUtility;
@@ -32,13 +33,10 @@ internal class PullRecordSettledCommandService(
 			   .ConfigureAwait(false)
 			   ?? Enumerable.Empty<GameWagerInfo>();
 
-			logger.LogDebug("LogOn:{logOn} Message: Game Wager Settled. GameWagers:{infos}", DateTime.Now.ToString("o"), infos);
-
 			if (infos.Any())
 			{
 				foreach (var info in infos)
 				{
-					logger.LogDebug("LogOn:{logOn} Message: Game Wager Settled. GameWager:{info}", DateTime.Now.ToString("o"), info);
 					try
 					{
 						await service.ExecuteAsync(
@@ -48,7 +46,19 @@ internal class PullRecordSettledCommandService(
 					}
 					catch (Exception ex)
 					{
-						logger.LogError(ex, "LogOn:{logOn} Message: An exception occurred in this game record.({info})", DateTime.Now.ToString("o"), info);
+						logger.LogError(ex, "{logError}",
+							JsonSerializer.Serialize(new
+							{
+								LogOn = DateTime.Now.ToString("u"),
+								Data = new
+								{
+									info.PlayerCode,
+									info.ExternalWagerId,
+									ExternalCreatedOn = info.ExternalCreatedOn.ToDateTimeOffset(),
+									ExternalClosedOn = info.ExternalClosedOn.ToDateTimeOffset()
+								},
+								Message = "An exception occurred in this game wager."
+							}));
 					}
 				}
 			}
